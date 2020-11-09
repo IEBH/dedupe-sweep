@@ -1,7 +1,12 @@
 var _ = require('lodash');
+var EventEmitter = require('events').EventEmitter;
 var natural = require('natural');
 
-module.exports = class Dedupe {
+
+/**
+* Dedupe class
+*/
+module.exports = class Dedupe extends EventEmitter {
 
 	/**
 	* Instance settings
@@ -106,6 +111,7 @@ module.exports = class Dedupe {
 	* @param {Object} [options] Initial options to populate
 	*/
 	constructor(options) {
+		super();
 		this.set(options);
 	}
 
@@ -118,21 +124,49 @@ module.exports = class Dedupe {
 	*/
 	set(option, value) {
 		if (_.isPlainObject(option)) {
-			this.settings[option] = value;
-		} else {
 			Object.assign(this.settings, option);
+		} else {
+			this.settings[option] = value;
 		}
 		return this;
 	}
 
 
 	/**
-	* The currently selected deduplication strategy
-	* This defaults to `stratergies/clark.js`
-	* @type {Object}
-	* @property {string} title The title of the strategy
-	* @property {string} description Basic description of the strategy
-	* @property {array<Object>} steps Collection to steps to apply
+	* Run the deduplication process
+	* @param {array|string} input Either an existing parsed collection of references or a path to parse
+	* @returns {Promise<array>} The output collection with an additional field `dedupe` which is a floating value between 0 - 1
+	*
+	* @emits runMutated Emitted when the fully mutated library is ready to start deduplicating
 	*/
-	stratergy = require('./strategies/clark');
+	run(input) {
+		return Promise.resolve()
+			.then(()=> {
+				// Parse inputs if they look like paths, otherwise assume they are given as arrays
+				return _.isString(input) ? reflib.promises.parseFile(input) : input;
+			})
+			// Sanity checks {{{
+			.then(input => {
+				if (!_.isArray(input)) throw new Error('Input is not an array');
+				if (!_.has(this, ['strategies', this.settings.strategy])) throw new Error('Unknown stratergy specified');
+				if (!_.isArray(_.get(this, ['strategies', this.settings.strategy, 'steps']))) throw new Error('Invalid stratergy schema');
+				return input;
+			})
+			// }}}
+			.then(input => {
+				var stratergy = this.strategies[this.settings.strategy];
+				return input.map(ref => ({
+					...ref, // Import original reference
+					..._.mapValues(stratergy.mutators, (mutators, field) =>
+						_.castArray(mutators).reduce((value, mutator) =>
+							this.mutators[mutator].handler(value, ref)
+						, ref[field] || '')
+					),
+				}));
+			})
+			.then(input => {
+				this.emit('runMutated', input);
+				// FIXME:
+			})
+	};
 }
