@@ -65,6 +65,21 @@ module.exports = class Dedupe {
 			description: 'Convert all upper-case alpha characters to lower case',
 			handler: v => v.toLowerCase(),
 		},
+		doiRewrite: {
+			title: 'Rewrite DOIs',
+			description: 'Attempt to tidy up mangled DOI fields from partial DOIs to full URLs',
+			handler(v, ref) {
+				if (v) {
+					return /^https:\/\//.test(v) ? v // Already ok
+					: /^http:\/\//.test(v) ? v.replace(/^http:/, 'https:') // using HTTP instead of HTTPS
+					: 'https://doi.org/' + v;
+				} else { // Look in ref.urls to try and find a misfiled DOI
+					var foundDoi = ref.urls.find(u => /^https:\/\/doi.org\//.test(u)); // Find first DOI looking URL
+					if (foundDoi) return foundDoi;
+					return ''; // Give up and return an empty string
+				}
+			},
+		},
 		numericOnly: {
 			title: 'Numeric only',
 			description: 'Remove all non-numeric characters',
