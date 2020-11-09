@@ -133,6 +133,20 @@ module.exports = class Dedupe extends EventEmitter {
 
 
 	/**
+	* Compare two references at against rules specified in a step
+	* @param {Object} a The first reference to compare
+	* @param {Object} b The second reference to compare
+	* @param {Object} step The step object, specifying the rules for comparison
+	* @returns {number} A floating value representing the similarity between the two references for this steps rules
+	*/
+	compareViaStep(a, b, step) {
+		return step.fields.reduce((result, field) =>
+			this.comparisons[step.comparison].handler(a[field], b[field])
+		, 0) / step.fields.length;
+	};
+
+
+	/**
 	* Run the deduplication process
 	* @param {array|string} input Either an existing parsed collection of references or a path to parse
 	* @returns {Promise<array>} The output collection with an additional field `dedupe` which is a floating value between 0 - 1
@@ -140,23 +154,27 @@ module.exports = class Dedupe extends EventEmitter {
 	* @emits runMutated Emitted when the fully mutated library is ready to start deduplicating
 	*/
 	run(input) {
+		var stratergy = this.strategies[this.settings.strategy];
+		var output;
+
 		return Promise.resolve()
 			.then(()=> {
 				// Parse inputs if they look like paths, otherwise assume they are given as arrays
 				return _.isString(input) ? reflib.promises.parseFile(input) : input;
 			})
 			// Sanity checks {{{
-			.then(input => {
-				if (!_.isArray(input)) throw new Error('Input is not an array');
+			.then(refs => {
+				if (!_.isArray(refs)) throw new Error('Input is not an array');
 				if (!_.has(this, ['strategies', this.settings.strategy])) throw new Error('Unknown stratergy specified');
 				if (!_.isArray(_.get(this, ['strategies', this.settings.strategy, 'steps']))) throw new Error('Invalid stratergy schema');
-				return input;
+				return output = refs;
 			})
 			// }}}
-			.then(input => {
-				var stratergy = this.strategies[this.settings.strategy];
-				return input.map(ref => ({
-					...ref, // Import original reference
+			.then(refs => {
+				return refs.map(ref => ({
+					original: ref,
+					dedupe: {isDupe: false, chance: 0, steps: []}, // Storage for future dedupe info
+					...ref, // Import original reference fields
 					..._.mapValues(stratergy.mutators, (mutators, field) =>
 						_.castArray(mutators).reduce((value, mutator) =>
 							this.mutators[mutator].handler(value, ref)
@@ -164,9 +182,44 @@ module.exports = class Dedupe extends EventEmitter {
 					),
 				}));
 			})
-			.then(input => {
-				this.emit('runMutated', input);
-				// FIXME:
+			.then(refs => {
+				this.emit('runMutated', refs);
+				stratergy.steps.forEach((step, stepIndex) => { // For each step
+					var sortedRefs = _.sortBy(refs, step.fields); // Sort by the designated fields
+					for (let i = 0; i < refs.length - 1; i++) { // Walk all elements of the array...
+						var dupeScore = this.compareViaStep(refs[i], refs[i+1], step);
+						if (dupeScore > 0) { // Hit a duplicate, `i` is now the index of the last unique ref
+							refs[i].dedupe.steps[stepIndex] = {score: 0};
+							refs[i+1].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: i};
+							for (let n = i + 1; n < refs.length; n++) { // Look forwards to see how many future items are also dupes
+								console.log('CHK2', n, refs[n]);
+								var dupeScore2 = this.compareViaStep(refs[i], refs[n], step);
+								if (dupeScore2 > 0) {
+									refs[n].dedupe.steps[stepIndex] = {isDupe: true, score: dupeScore, dupeOf: i};
+								} else { // Hit next non-dupe - stop processing and move pointer to this non-dupe record
+									console.log('STOP DUPE', {i,n});
+									i = n;
+									break;
+								}
+							}
+						} else {
+							refs[i].dedupe[`step${stepIndex}`] = {isDupe: false};
+						}
+					}
+					console.log(`//// END OF STEP ${stepIndex} ////`);
+				});
+				return refs;
 			})
+			.then(refs => output.map((ref, refIndex) => ({ // Crappy method to glue `dedupe` back onto the input array
+				...ref,
+				dedupe: {
+					score: _.sum(refs[refIndex].dedupe.steps.map(s => s.score)) / refs[refIndex].dedupe.steps.length,
+					dupeOf: _(refs[refIndex].dedupe.steps)
+						.map('dupeOf')
+						.uniq()
+						.filter(v => v !== undefined)
+						.value(),
+				},
+			})))
 	};
 }
