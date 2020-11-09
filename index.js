@@ -6,8 +6,11 @@ module.exports = class Dedupe {
 	/**
 	* Instance settings
 	* Can be set using the utility funciton `set(key, val)`
+	* @type {Object} The settings to use in this Dedupe instance
+	* @property {string} stratergy The stratergy to use on the next `run()` call
 	*/
 	settings = {
+		strategy: 'clark',
 	};
 
 
@@ -72,6 +75,13 @@ module.exports = class Dedupe {
 			description: 'Remove all wrapping brackets or other parenthesis, useful for translated titles',
 			handler: v => _.trim(v, '()[]{}'),
 		},
+	};
+	// }}}
+
+	// Strategies {{{
+	strategies = {
+		clark: require('./strategies/clark'),
+		doiOnly: require('./strategies/doiOnly'),
 	};
 	// }}}
 
