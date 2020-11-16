@@ -6,6 +6,7 @@ module.exports = {
 	},
 	steps: [
 		{
+			sort: 'doi',
 			fields: ['doi'],
 			comparison: 'exact',
 		},

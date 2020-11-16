@@ -13,9 +13,23 @@ module.exports = class Dedupe extends EventEmitter {
 	* Can be set using the utility funciton `set(key, val)`
 	* @type {Object} The settings to use in this Dedupe instance
 	* @property {string} stratergy The stratergy to use on the next `run()` call
+	* @property {boolean} validateStratergy Validate the strategy before beginning, only disable this if you are sure the strategy is valid
+	* @property {string} action The action to take when detecting a duplicate. ENUM: 'stats', 'mark', 'delete'
+	* @property {string} actionField The field to use with actions
+	* @property {number} threshold Floating value (between 0 and 1) when marking or deleting refs automatically
+	* @property {string|function} markOk String value to set the action field to when `actionField=='mark'` and the ref is a non-dupe, if a function it is called as `(ref)`
+	* @property {string|function} markDupe String value to set the action field to when `actionField=='mark'` and the ref is a dupe, if a function it is called as `(ref)`
+	* @property {string} dedupeRef How to refer to other refs when `actionfield=='stats'`. ENUM: 'recNumber', 'offset'
 	*/
 	settings = {
 		strategy: 'clark',
+		validateStratergy: true,
+		action: 'stats',
+		actionField: 'dedupe',
+		threshold: 0.1,
+		markOk: 'OK',
+		markDupe: 'DUPE',
+		dupeRef: 'index',
 	};
 
 
@@ -133,6 +147,31 @@ module.exports = class Dedupe extends EventEmitter {
 
 
 	/**
+	* Validate a strategy object
+	* @param {object} stratergy The stratergy object to validate
+	* @returns {boolean|array} Either a boolean True if the stratergy is valid or an array of errors
+	*/
+	validateStratergy(stratergy) {
+		var errs = [];
+
+		['title', 'description', 'mutators', 'steps'].forEach(f => {
+			if (!stratergy[f]) errs.push(`Field ${f} is missing`);
+		});
+
+		if (!stratergy.steps.length) errs.push('Should contain at least one step');
+
+		if (stratergy.steps) stratergy.steps.forEach((step, stepIndex) => {
+			if (!step.fields || !step.fields.length) errs.push(`Step #${stepIndex+1} contains no fields`);
+			if (!step.sort) errs.push(`Step #${stepIndex+1} contains no sort field(s)`);
+			if (_.isArray(step.sort) && !step.sort.length) errs.push(`Step #${stepIndex+1} contains a blank sort field list`)
+			if (!step.comparison) errs.push(`Step #${stepIndex+1} contains no comparison`);
+		});
+
+		return errs.length > 0 ? errs : true;
+	};
+
+
+	/**
 	* Compare two references at against rules specified in a step
 	* @param {Object} a The first reference to compare
 	* @param {Object} b The second reference to compare
@@ -170,56 +209,110 @@ module.exports = class Dedupe extends EventEmitter {
 				return output = refs;
 			})
 			// }}}
-			.then(refs => {
-				return refs.map(ref => ({
-					original: ref,
-					dedupe: {isDupe: false, chance: 0, steps: []}, // Storage for future dedupe info
-					...ref, // Import original reference fields
+			// Validate stratergy {{{
+			.then(()=> {
+				if (!this.settings.validateStratergy) return; // Checking disabled
+
+				var sErrs = this.validateStratergy(stratergy);
+				if (sErrs === true) return;
+				throw new Error('Invalid stratergy - ' + sErrs.join(', '));
+			})
+			// }}}
+			.then(()=> {
+				var refs = output;
+				return refs.map((original, index) => ({
+					original,
+					index,
+					recNumber: original.refNumber || index + 1,
+					dedupe: {steps: []}, // Storage for future dedupe info
+					...original, // Import original reference fields
 					..._.mapValues(stratergy.mutators, (mutators, field) =>
 						_.castArray(mutators).reduce((value, mutator) =>
-							this.mutators[mutator].handler(value, ref)
-						, ref[field] || '')
+							this.mutators[mutator].handler(value, original)
+						, original[field] || '')
 					),
 				}));
 			})
 			.then(refs => {
 				this.emit('runMutated', refs);
+				var sortedBy; // Keep track of our sort so we don't repeat this
+				var sortedRefs; // Current state of refs
+
 				stratergy.steps.forEach((step, stepIndex) => { // For each step
-					var sortedRefs = _.sortBy(refs, step.fields); // Sort by the designated fields
-					for (let i = 0; i < refs.length - 1; i++) { // Walk all elements of the array...
-						var dupeScore = this.compareViaStep(refs[i], refs[i+1], step);
+					if (!sortedBy || sortedBy != step.sort) { // Sort if needed
+						sortedRefs = _.sortBy(refs, step.sort); // Sort by the designated fields
+						sortedBy = step.sort;
+					}
+
+					for (var i = 0; i < sortedRefs.length - 1; i++) { // Walk all elements of the array...
+						// console.log('ITER', i);
+						var dupeScore = this.compareViaStep(sortedRefs[i], sortedRefs[i+1], step);
 						if (dupeScore > 0) { // Hit a duplicate, `i` is now the index of the last unique ref
-							refs[i].dedupe.steps[stepIndex] = {score: 0};
-							refs[i+1].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: i};
-							for (let n = i + 1; n < refs.length; n++) { // Look forwards to see how many future items are also dupes
-								console.log('CHK2', n, refs[n]);
-								var dupeScore2 = this.compareViaStep(refs[i], refs[n], step);
+							sortedRefs[i].dedupe.steps[stepIndex] = {score: 0};
+							sortedRefs[i+1].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == 'recNumber' ? sortedRefs[i].recNumber : sortedRefs[i].index};
+
+							var n = i + 1;
+							while (true) {
+								// console.log('COMP', i, '<=>', n, '/', sortedRefs.length);
+								var dupeScore2 = this.compareViaStep(sortedRefs[i], sortedRefs[n], step);
 								if (dupeScore2 > 0) {
-									refs[n].dedupe.steps[stepIndex] = {isDupe: true, score: dupeScore, dupeOf: i};
-								} else { // Hit next non-dupe - stop processing and move pointer to this non-dupe record
-									console.log('STOP DUPE', {i,n});
+									// console.log('DECLARE', n, 'DUPEOF', i);
+									sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore2, dupeOf: this.settings.dupeRef == 'recNumber' ? sortedRefs[i].recNumber : sortedRefs[i].index};
 									i = n;
+								} else if (dupeScore <= 0) { // Hit next non-dupe - stop processing and move pointer to this non-dupe record
+									// console.log('NODUPE', n);
 									break;
 								}
+
+								if (n >= sortedRefs.length - 1) { // Exhausted iteration - set outer pointer to end
+									// console.log('EXHAUST', n);
+									break;
+								}
+
+								n++; // Continue iterating
 							}
 						} else {
-							refs[i].dedupe[`step${stepIndex}`] = {isDupe: false};
+							sortedRefs[i].dedupe[`step${stepIndex}`] = {score: 0};
 						}
 					}
-					console.log(`//// END OF STEP ${stepIndex} ////`);
+					// console.log(`//// END OF STEP ${stepIndex} ////`);
 				});
+
 				return refs;
 			})
-			.then(refs => output.map((ref, refIndex) => ({ // Crappy method to glue `dedupe` back onto the input array
+			.then(refs => refs.map(ref => ({
 				...ref,
 				dedupe: {
-					score: _.sum(refs[refIndex].dedupe.steps.map(s => s.score)) / refs[refIndex].dedupe.steps.length,
-					dupeOf: _(refs[refIndex].dedupe.steps)
-						.map('dupeOf')
-						.uniq()
-						.filter(v => v !== undefined)
-						.value(),
+					...ref.dedupe,
+					score: ref.dedupe.steps.length > 0 ? _.sum(ref.dedupe.steps.map(s => s.score)) / ref.dedupe.steps.length : 0,
 				},
 			})))
+			.then(refs => {
+				switch (this.settings.action) {
+					case 'stats': // Decorate refs with stats
+						return output.map((ref, refIndex) => ({ // Glue the stats back onto the input array
+							...ref,
+							[this.settings.actionField]: {
+								score: refs[refIndex].dedupe.score,
+								dupeOf: _(refs[refIndex].dedupe.steps)
+									.map('dupeOf')
+									.uniq()
+									.filter(v => v !== undefined)
+									.value(),
+							},
+						}))
+
+					case 'mark': // Set a simple field if the ref score is above the threshold
+						return output.map((ref, refIndex) => ({ // Glue the stats back onto the input array
+							...ref,
+							[this.settings.actionField]: refs[refIndex].dedupe.score >= this.settings.threshold
+								? _.isFunction(this.settings.markDupe) ? this.settings.markDupe(ref) : this.settings.markDupe
+								: _.isFunction(this.settings.markOk) ? this.settings.markOk(ref) : this.settings.markOk,
+						}))
+
+					case 'delete': // Remove all refs above the threshold
+						return output.filter((ref, refIndex) => refs[refIndex].dedupe.score < this.settings.threshold)
+				}
+			})
 	};
 }
