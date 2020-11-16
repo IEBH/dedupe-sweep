@@ -14,22 +14,42 @@ module.exports = class Dedupe extends EventEmitter {
 	* @type {Object} The settings to use in this Dedupe instance
 	* @property {string} stratergy The stratergy to use on the next `run()` call
 	* @property {boolean} validateStratergy Validate the strategy before beginning, only disable this if you are sure the strategy is valid
-	* @property {string} action The action to take when detecting a duplicate. ENUM: 'stats', 'mark', 'delete'
+	* @property {string} action The action to take when detecting a duplicate. ENUM: ACTIONS
 	* @property {string} actionField The field to use with actions
 	* @property {number} threshold Floating value (between 0 and 1) when marking or deleting refs automatically
 	* @property {string|function} markOk String value to set the action field to when `actionField=='mark'` and the ref is a non-dupe, if a function it is called as `(ref)`
 	* @property {string|function} markDupe String value to set the action field to when `actionField=='mark'` and the ref is a dupe, if a function it is called as `(ref)`
-	* @property {string} dedupeRef How to refer to other refs when `actionfield=='stats'`. ENUM: 'recNumber', 'offset'
+	* @property {string} dupeRef How to refer to other refs when `actionfield=='stats'`. ENUM: DUPEREF
 	*/
 	settings = {
 		strategy: 'clark',
 		validateStratergy: true,
-		action: 'stats',
+		action: 0,
 		actionField: 'dedupe',
 		threshold: 0.1,
 		markOk: 'OK',
 		markDupe: 'DUPE',
-		dupeRef: 'index',
+		dupeRef: 0,
+	};
+
+
+
+	/**
+	* Available actions for duplicates
+	*/
+	static ACTIONS = {
+		STATS: 0,
+		MARK: 1,
+		DELETE: 2,
+	};
+
+
+	/**
+	* Available methods to set the `dupeRef` - which appears as `dupeOf` when `actionfield=='stats'`
+	*/
+	static DUPEREF = {
+		INDEX: 0,
+		RECNUMBER: 1,
 	};
 
 
@@ -126,6 +146,8 @@ module.exports = class Dedupe extends EventEmitter {
 	*/
 	constructor(options) {
 		super();
+		this.settings.action = Dedupe.ACTIONS.STATS;
+		this.settings.dedupeRef = Dedupe.DUPEREF.INDEX;
 		this.set(options);
 	}
 
@@ -198,6 +220,9 @@ module.exports = class Dedupe extends EventEmitter {
 
 		return Promise.resolve()
 			.then(()=> {
+				if (!Object.values(Dedupe.ACTIONS).includes(this.settings.action)) throw new Error(`Invalid action "${this.settings.action}" - choose one action from Dedupe.ACTIONS`);
+				if (!Object.values(Dedupe.DUPEREF).includes(this.settings.dupeRef)) throw new Error(`Invalid dupeRef "${this.settings.dupeRef}" - choose one action from Dedupe.DUPEREF`);
+
 				// Parse inputs if they look like paths, otherwise assume they are given as arrays
 				return _.isString(input) ? reflib.promises.parseFile(input) : input;
 			})
@@ -249,7 +274,7 @@ module.exports = class Dedupe extends EventEmitter {
 						var dupeScore = this.compareViaStep(sortedRefs[i], sortedRefs[i+1], step);
 						if (dupeScore > 0) { // Hit a duplicate, `i` is now the index of the last unique ref
 							sortedRefs[i].dedupe.steps[stepIndex] = {score: 0};
-							sortedRefs[i+1].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == 'recNumber' ? sortedRefs[i].recNumber : sortedRefs[i].index};
+							sortedRefs[i+1].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
 
 							var n = i + 1;
 							while (true) {
@@ -257,7 +282,7 @@ module.exports = class Dedupe extends EventEmitter {
 								var dupeScore2 = this.compareViaStep(sortedRefs[i], sortedRefs[n], step);
 								if (dupeScore2 > 0) {
 									// console.log('DECLARE', n, 'DUPEOF', i);
-									sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore2, dupeOf: this.settings.dupeRef == 'recNumber' ? sortedRefs[i].recNumber : sortedRefs[i].index};
+									sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore2, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
 									i = n;
 								} else if (dupeScore <= 0) { // Hit next non-dupe - stop processing and move pointer to this non-dupe record
 									// console.log('NODUPE', n);
@@ -289,7 +314,7 @@ module.exports = class Dedupe extends EventEmitter {
 			})))
 			.then(refs => {
 				switch (this.settings.action) {
-					case 'stats': // Decorate refs with stats
+					case Dedupe.ACTIONS.STATS: // Decorate refs with stats
 						return output.map((ref, refIndex) => ({ // Glue the stats back onto the input array
 							...ref,
 							[this.settings.actionField]: {
@@ -302,7 +327,7 @@ module.exports = class Dedupe extends EventEmitter {
 							},
 						}))
 
-					case 'mark': // Set a simple field if the ref score is above the threshold
+					case Dedupe.ACTIONS.MARK: // Set a simple field if the ref score is above the threshold
 						return output.map((ref, refIndex) => ({ // Glue the stats back onto the input array
 							...ref,
 							[this.settings.actionField]: refs[refIndex].dedupe.score >= this.settings.threshold
@@ -310,7 +335,7 @@ module.exports = class Dedupe extends EventEmitter {
 								: _.isFunction(this.settings.markOk) ? this.settings.markOk(ref) : this.settings.markOk,
 						}))
 
-					case 'delete': // Remove all refs above the threshold
+					case Dedupe.ACTIONS.DELETE: // Remove all refs above the threshold
 						return output.filter((ref, refIndex) => refs[refIndex].dedupe.score < this.settings.threshold)
 				}
 			})

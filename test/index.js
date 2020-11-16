@@ -38,7 +38,7 @@ describe('Basic dedupe functionality', ()=> {
 	it('should correctly identify duplicate DOIs and provide stats (#2)', ()=>
 		(new Dedupe())
 			.set('strategy', 'doiOnly')
-			.set('dupeRef', 'recNumber')
+			.set('dupeRef', Dedupe.DUPEREF.RECNUMBER)
 			.run([
 				{recNumber: 1, doi: 'https://doi.org/10.1000/182'},
 				{recNumber: 2, doi: '10.1234/123'},
@@ -59,7 +59,7 @@ describe('Basic dedupe functionality', ()=> {
 	it('should correctly mark duplicate DOIs', ()=>
 		(new Dedupe())
 			.set('strategy', 'doiOnly')
-			.set('action', 'mark')
+			.set('action', Dedupe.ACTIONS.MARK)
 			.set('markOk', ref => 'OK!')
 			.set('markDupe', ref => 'DUPE!')
 			.run([
@@ -76,7 +76,7 @@ describe('Basic dedupe functionality', ()=> {
 	it('should correctly delete duplicate DOIs', ()=>
 		(new Dedupe())
 			.set('strategy', 'doiOnly')
-			.set('action', 'delete')
+			.set('action', Dedupe.ACTIONS.DELETE)
 			.run([
 				{doi: 'https://doi.org/10.1000/182'},
 				{doi: '10.1000/182'},
@@ -101,7 +101,7 @@ describe('Basic dedupe functionality', ()=> {
 
 		return (new Dedupe())
 			.set('strategy', 'doiOnly')
-			.set('action', 'delete')
+			.set('action', Dedupe.ACTIONS.DELETE)
 			.on('runMutated', refs => { // Check all refs have been rewritten
 				refs.forEach(ref =>
 					expect(_.pick(ref, 'doi')).to.have.property('doi', 'https://doi.org/10.1000/182')
