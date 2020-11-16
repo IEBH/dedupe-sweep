@@ -79,8 +79,8 @@ module.exports = class Dedupe extends EventEmitter {
 					: /^http:\/\//.test(v) ? v.replace(/^http:/, 'https:') // using HTTP instead of HTTPS
 					: 'https://doi.org/' + v;
 				} else { // Look in ref.urls to try and find a misfiled DOI
-					var foundDoi = ref.urls.find(u => /^https:\/\/doi.org\//.test(u)); // Find first DOI looking URL
-					if (foundDoi) return foundDoi;
+					var foundDoi = ref.urls.find(u => /^https?:\/\/doi.org\//.test(u)); // Find first DOI looking URL
+					if (foundDoi) return foundDoi.replace(/^http:/, 'https:');
 					return ''; // Give up and return an empty string
 				}
 			},
