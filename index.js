@@ -141,7 +141,7 @@ module.exports = class Dedupe extends EventEmitter {
 			description: 'Convert all <a href="https://en.wikipedia.org/wiki/Latin-1_Supplement_(Unicode_block)#Character_table">latin-1 supplementary letters</a> to basic latin letters and also remove <a href="https://en.wikipedia.org/wiki/Combining_Diacritical_Marks">combining diacritical marks</a>. e.g. <code>ÕÑÎÔÑ</code> becomes <code>ONION</code>',
 			handler: v => _.deburr(v),
 		},
-		disguardCase: {
+		noCase: {
 			title: 'Case insenstive',
 			description: 'Convert all upper-case alpha characters to lower case',
 			handler: v => v.toLowerCase(),

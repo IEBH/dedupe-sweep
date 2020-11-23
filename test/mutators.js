@@ -30,16 +30,16 @@ describe('Mutators', ()=> {
 		expect(dedupe.mutators.deburr.handler('ÕÑÎÔÑ')).to.equal('ONION');
 	});
 
-	it('disguardCase', ()=> {
-		expect(dedupe.mutators.disguardCase.handler('Hello World')).to.equal('hello world');
-	});
-
 	it('doiRewrite', ()=> {
 		expect(dedupe.mutators.doiRewrite.handler('https://doi.org/10.1000/182')).to.equal('https://doi.org/10.1000/182');
 		expect(dedupe.mutators.doiRewrite.handler('http://doi.org/10.1000/182')).to.equal('https://doi.org/10.1000/182');
 		expect(dedupe.mutators.doiRewrite.handler('10.1000/182')).to.equal('https://doi.org/10.1000/182');
 		expect(dedupe.mutators.doiRewrite.handler('', {urls: ['https://doi.org/10.1000/182']})).to.equal('https://doi.org/10.1000/182');
 		expect(dedupe.mutators.doiRewrite.handler('', {urls: ['http://doi.org/10.1000/182']})).to.equal('https://doi.org/10.1000/182');
+	});
+
+	it('noCase', ()=> {
+		expect(dedupe.mutators.noCase.handler('Hello World')).to.equal('hello world');
 	});
 
 	it('numericOnly', ()=> {
