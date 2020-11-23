@@ -97,27 +97,44 @@ module.exports = class Dedupe extends EventEmitter {
 		authorRewrite: {
 			title: 'Rewrite author names',
 			description: 'Clean up various author specifications into one standard format',
-			handler: v => _.chain(v)
-				.split(/\s*,\s*/) // Split into names
-				.dropRightWhile(name => /^et\.?\s*al/i.test(name)) // Looks like "Et. Al" from end
-				.map(name => { // Reparse all names
-					var format = [
-						/^(?<first>[A-Z][a-z]+)\s+(?<last>[A-Z][a-z]+)$/, //~= First Last
-						/^(?<first>[A-Z])\.?\s+(?<middle>.*?)\s*(?<last>[A-Z][a-z]+)$/, //~= F. Last
-						/^(?<first>[A-Z][a-z]+?)\s+(?<middle>.*?)\s*(?<last>[A-Z][a-z]+)$/, //~= First Middle Last
-						/^(?<last>[A-Z][a-z]+)\s+(?<middle>.*?)\s*(?<first>[A-Z])\.?$/, //~= Last F.
-					].reduce((matchingFormat, re) =>
-						matchingFormat // Already found a match
-						|| re.exec(name) // Attempt to match this element
-					, false);
+			handler: v => {
+				if (/;/.test(v)) { // Detect semi colon seperators to search `Last, F. M.` format
+					return _.chain(v)
+						.split(/\s*;\s*/)
+						.dropRightWhile(name => /^et\.?\s*al/i.test(name)) // Looks like "Et. Al" from end
+						.map(name => {
+							var format = /^(?<last>[A-Z][a-z]+),?\s+(?<first>[A-Z])/.exec(name);
+							return format ?
+								format.groups.first.substr(0, 1).toUpperCase() + '. '
+								+ _.upperFirst(format.groups.last)
+							: name;
+						})
+						.join(', ')
+						.value()
+				} else {
+					return _.chain(v)
+						.split(/\s*,\s*/) // Split into names
+						.dropRightWhile(name => /^et\.?\s*al/i.test(name)) // Looks like "Et. Al" from end
+						.map(name => { // Reparse all names
+							var format = [
+								/^(?<first>[A-Z][a-z]+)\s+(?<last>[A-Z][a-z]+)$/, //~= First Last
+								/^(?<first>[A-Z])\.?\s+(?<middle>.*?)\s*(?<last>[A-Z][a-z]+)$/, //~= F. Last
+								/^(?<first>[A-Z][a-z]+?)\s+(?<middle>.*?)\s*(?<last>[A-Z][a-z]+)$/, //~= First Middle Last
+								/^(?<last>[A-Z][a-z]+)\s+(?<middle>.*?)\s*(?<first>[A-Z]\.?)/, //~= Last F.
+							].reduce((matchingFormat, re) =>
+								matchingFormat // Already found a match
+								|| re.exec(name) // Attempt to match this element
+							, false);
 
-					return format ?
-						format.groups.first.substr(0, 1).toUpperCase() + '. '
-						+ _.upperFirst(format.groups.last)
-					: name;
-				})
-				.join(', ') // Join as comma-delimetered strings
-				.value()
+							return format ?
+								format.groups.first.substr(0, 1).toUpperCase() + '. '
+								+ _.upperFirst(format.groups.last)
+							: name;
+						})
+						.join(', ') // Join as comma-delimetered strings
+						.value();
+				}
+			},
 		},
 		deburr: {
 			title: 'Deburr',

@@ -15,9 +15,15 @@ describe('Mutators', ()=> {
 		expect(dedupe.mutators.authorRewrite.handler('Bill Gates, Steven Anthony Balmer')).to.equal('B. Gates, S. Balmer');
 		expect(dedupe.mutators.authorRewrite.handler('B Gates, S Balmer')).to.equal('B. Gates, S. Balmer');
 		expect(dedupe.mutators.authorRewrite.handler('Gates B., Balmer S.')).to.equal('B. Gates, S. Balmer');
+		expect(dedupe.mutators.authorRewrite.handler('Gates B., Balmer S.')).to.equal('B. Gates, S. Balmer');
 		expect(dedupe.mutators.authorRewrite.handler('Gates B, Balmer S')).to.equal('B. Gates, S. Balmer');
+		expect(dedupe.mutators.authorRewrite.handler('Gates BH, Balmer SF')).to.equal('B. Gates, S. Balmer');
 		expect(dedupe.mutators.authorRewrite.handler('W H Gates, S F Balmer')).to.equal('W. Gates, S. Balmer');
 		expect(dedupe.mutators.authorRewrite.handler('William Henry Gates, Steven F. Balmer')).to.equal('W. Gates, S. Balmer');
+		expect(dedupe.mutators.authorRewrite.handler('Gates, B; Balmer S')).to.equal('B. Gates, S. Balmer');
+		expect(dedupe.mutators.authorRewrite.handler('Gates, Bill; Balmer Steven')).to.equal('B. Gates, S. Balmer');
+		expect(dedupe.mutators.authorRewrite.handler('Gates, B. H; Balmer S F.')).to.equal('B. Gates, S. Balmer');
+		expect(dedupe.mutators.authorRewrite.handler('Gates, B. H.; Balmer S. F.')).to.equal('B. Gates, S. Balmer');
 	});
 
 	it('deburr', ()=> {
