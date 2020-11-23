@@ -9,14 +9,15 @@ describe('Mutators', ()=> {
 		expect(dedupe.mutators.alphaNumericOnly.handler('one$two_three()')).to.equal('one two three ');
 	});
 
-	it.skip('authorRewrite', ()=> {
+	it('authorRewrite', ()=> {
 		expect(dedupe.mutators.authorRewrite.handler('Bill Gates')).to.equal('B. Gates');
 		expect(dedupe.mutators.authorRewrite.handler('William Henry Gates')).to.equal('W. Gates');
 		expect(dedupe.mutators.authorRewrite.handler('Bill Gates, Steven Anthony Balmer')).to.equal('B. Gates, S. Balmer');
 		expect(dedupe.mutators.authorRewrite.handler('B Gates, S Balmer')).to.equal('B. Gates, S. Balmer');
 		expect(dedupe.mutators.authorRewrite.handler('Gates B., Balmer S.')).to.equal('B. Gates, S. Balmer');
-		expect(dedupe.mutators.authorRewrite.handler('W H Gates, S Balmer')).to.equal('B. Gates, S. Balmer');
-		expect(dedupe.mutators.authorRewrite.handler('William Henry Gates III, Steven F. Balmer')).to.equal('W. Gates, S. Balmer');
+		expect(dedupe.mutators.authorRewrite.handler('Gates B, Balmer S')).to.equal('B. Gates, S. Balmer');
+		expect(dedupe.mutators.authorRewrite.handler('W H Gates, S F Balmer')).to.equal('W. Gates, S. Balmer');
+		expect(dedupe.mutators.authorRewrite.handler('William Henry Gates, Steven F. Balmer')).to.equal('W. Gates, S. Balmer');
 	});
 
 	it('deburr', ()=> {
