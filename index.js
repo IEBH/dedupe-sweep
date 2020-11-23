@@ -67,6 +67,11 @@ module.exports = class Dedupe extends EventEmitter {
 			description: 'Simple character-by-character exact comaprison',
 			handler: (a, b) => a == b ? 1 : 0,
 		},
+		exactTruncate: {
+			title: 'Exact comparison with truncate',
+			description: 'Exact comparison but truncate strings to the shortest',
+			handler: (a, b) => a.substr(0, Math.min(a.length, b.length)) == b.substr(0, Math.min(a.length, b.length)) ? 1 : 0,
+		},
 		jaroWinkler: {
 			title: 'Jaro-Winkler',
 			description: 'String distance / difference calculator using the [Jaro-Winkler metric](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)',
