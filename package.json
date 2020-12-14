@@ -1,6 +1,6 @@
 {
   "name": "@iebh/dedupe-sweep",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Deduplicate reference libraries using the sweep method",
   "main": "index.js",
   "scripts": {
@@ -27,6 +27,6 @@
   "dependencies": {
     "lodash": "^4.17.20",
     "natural": "^2.1.5",
-    "reflib": "^1.7.5"
+    "reflib": "^1.8.1"
   }
 }
