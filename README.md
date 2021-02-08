@@ -37,6 +37,109 @@ await reflib.promises.outputFile('my-large-reference-library-deduped.xml', dedup
 ```
 
 
+API
+===
+
+Constructor: Dedupe(options)
+----------------------------
+Returns a Dedupe class which extends a basic EventEmitter.
+
+
+Dedupe.settings
+---------------
+Object storing all local settings for the class.
+
+| Setting           | Type              | Default    | Description                                                                                                                         |
+|-------------------|-------------------|------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| stratergy         | string            | `'clark'`  | The stratergy to use on the next `run()` call                                                                                       |
+| validateStratergy | boolean           | `true`     | Validate the strategy before beginning, only disable this if you are sure the strategy is valid                                     |
+| action            | string            | '0'        | The action to take when detecting a duplicate. ENUM: ACTIONS                                                                        |
+| actionField       | string            | `'dedupe'` | The field to use with actions                                                                                                       |
+| threshold         | number            | `0.1`      | Floating value (between 0 and 1) when marking or deleting refs automatically                                                        |
+| markOk            | string / function | `'OK'`     | String value to set the action field to when `actionField=='mark'` and the ref is a non-dupe, if a function it is called as `(ref)` |
+| markDupe          | string / function | `'DUPE'`   | String value to set the action field to when `actionField=='mark'` and the ref is a dupe, if a function it is called as `(ref)`     |
+| dupeRef           | string            | `0`        | How to refer to other refs when `actionfield=='stats'`. ENUM: DUPEREF                                                               |
+
+
+Static: Dedupe.ACTIONS
+----------------------
+Actions to take when detecting duplicates
+
+| Value | Setting    | Description                                                                                                                               |
+|-------|------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| `0`   | `'STATS'`  | Add the field field in `Dedupe.settings.actionField` with the deduplicate chance to the input                                             |
+| `1`   | `'MARK'`   | Set the field in `Dedupe.settings.actionField` to `Dedupe.settings.mark{Ok,Dupe}` depending on duplicate status but leave input unchanged |
+| `2`   | `'DELETE'` | Remove duplicates from input and return sliced output                                                                                     |
+
+
+Static: Dedupe.DUPEREF
+----------------------
+How to refer to other references.
+
+| Value | Setting       | Description                                                  |
+|-------|---------------|--------------------------------------------------------------|
+| `0`   | `'INDEX'`     | Refer to other references by their offset in the input array |
+| `1`   | `'RECNUMBER'` | Refer to other references by their `recnumber` field         |
+
+
+Dedupe.comparisons
+------------------
+A lookup object of comparison functions used within strategies.
+
+Each comparison is made up of:
+
+
+| Setting       | Type     | Description                                                                                            |
+|---------------|----------|--------------------------------------------------------------------------------------------------------|
+| key           | string   | Internal short name of the comparison in camelCase                                                     |
+| `title`       | string   | Human friendly title of the comparison                                                                 |
+| `description` | string   | Longer description of what the comparison does                                                         |
+| `handler`     | function | Function, called as `(a, b)` for fields which is expected to return a floating value of duplicate-ness |
+
+
+Dedupe.mutators
+---------------
+A lookup object of field mutators used within strategies.
+
+Each mutator is made up of:
+
+
+| Setting       | Type     | Description                                                                 |
+|---------------|----------|-----------------------------------------------------------------------------|
+| key           | string   | Internal short name of the mutator in camelCase                             |
+| `title`       | string   | Human friendly title of the mutator                                         |
+| `description` | string   | Longer description of what the mutator does                                 |
+| `handler`     | function | Function, called as `(value)` which is expected to return the mutated input |
+
+
+Static: Dedupe.strategies
+-------------------------
+A lookup object of strategies.
+
+Each strategy is made up of:
+
+
+| Setting         | Type       | Description                                                                   |
+|-----------------|------------|-------------------------------------------------------------------------------|
+| key             | string     | Internal short name of the strategy in camelCase                              |
+| `title`         | string     | Human friendly title of the strategy                                          |
+| `description`   | string     | Longer description of the strategy                                            |
+| `mutators`      | object     | List of fields which will be mutated and how, prior to the strategy being run |
+| `steps`         | array      | Array of steps to take when running the strategy                              |
+
+
+Dedupe.set(option, value)
+-------------------------
+Convenience function to quickly set a single option, or merge an object of options.
+Returns the original Dedupe instance.
+
+
+Dedupe.run(input)
+-----------------
+Takes an array of input references applying the action specified in `Dedupe.settings.action`.
+Returns a promise.
+
+
 Strategies
 ==========
 This module includes a selection of [deduplication strategies](./strategies) which are basic JavaScript objects which detail steps to take to detect reference duplication.
@@ -61,7 +164,7 @@ module.exports = {
 };
 ```
 
-Stratergy format:
+**Strategy format:**
 
 | Path                 | Type     | Description                                                                               |
 |----------------------|----------|-------------------------------------------------------------------------------------------|
