@@ -166,11 +166,12 @@ module.exports = {
 
 **Strategy format:**
 
-| Path                 | Type     | Description                                                                               |
-|----------------------|----------|-------------------------------------------------------------------------------------------|
-| `title`              | `string` | The short human-readable title of the strategy                                            |
-| `description`        | `string` | A longer, HTML compatible description of the strategy                                     |
-| `mutators`           | `object` | An object of the reference properties to mutate prior to processing, each value should be a known mutator |
-| `steps`              | `array`  | A collection of steps for the deduplication process                                       |
-| `steps[].fields`     | `array`  | An array of strings, each value should correspond to a known reference field              |
-| `steps[].comparison` | `string` | The comparison method to use in this step, should correspond to a known comparison method |
+| Path                 | Type      | Default | Description                                                                               |
+|----------------------|-----------|---------|-------------------------------------------------------------------------------------------|
+| `title`              | `string`  |         | The short human-readable title of the strategy                                            |
+| `description`        | `string`  |         | A longer, HTML compatible description of the strategy                                     |
+| `mutators`           | `object`  |         | An object of the reference properties to mutate prior to processing, each value should be a known mutator |
+| `steps`              | `array`   |         | A collection of steps for the deduplication process                                       |
+| `steps.skipOmitted`  | `boolean` | `true`  | Skip field comparison where either side is not specified                                  |
+| `steps[].fields`     | `array`   |         | An array of strings, each value should correspond to a known reference field              |
+| `steps[].comparison` | `string`  |         | The comparison method to use in this step, should correspond to a known comparison method |

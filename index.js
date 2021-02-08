@@ -244,7 +244,9 @@ module.exports = class Dedupe extends EventEmitter {
 	*/
 	compareViaStep(a, b, step) {
 		return step.fields.reduce((result, field) =>
-			this.comparisons[step.comparison].handler(a[field], b[field])
+			(step.skipOmitted ?? true ) && (!a[field] || !b[field])
+				? 0
+				: this.comparisons[step.comparison].handler(a[field], b[field])
 		, 0) / step.fields.length;
 	};
 

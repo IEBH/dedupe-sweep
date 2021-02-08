@@ -55,6 +55,26 @@ describe('Basic dedupe functionality', ()=> {
 			]))
 	);
 
+	it('should correctly identify duplicate DOIs and provide stats (missing fields)', ()=>
+		(new Dedupe())
+			.set('strategy', 'doiOnly')
+			.set('dupeRef', Dedupe.DUPEREF.RECNUMBER)
+			.run([
+				{recNumber: 1, doi: 'https://doi.org/10.1000/182'},
+				{recNumber: 2}, // Intentionally omitted DoI data
+				{recNumber: 3},
+				{recNumber: 4, urls: ['https://doi.org/10.1000/182']},
+				{recNumber: 5, doi: 'https://doi.org/10.1000/182'},
+			])
+			.then(output => expect(output).to.be.deep.equal([
+				{recNumber: 1, doi: 'https://doi.org/10.1000/182', dedupe: {score: 0, dupeOf: []}},
+				{recNumber: 2, dedupe: {score: 0, dupeOf: []}},
+				{recNumber: 3, dedupe: {score: 0, dupeOf: []}},
+				{recNumber: 4, urls: ['https://doi.org/10.1000/182'], dedupe: {score: 1, dupeOf: [1]}},
+				{recNumber: 5, doi: 'https://doi.org/10.1000/182', dedupe: {score: 1, dupeOf: [4]}},
+			]))
+	);
+
 
 	it('should correctly mark duplicate DOIs', ()=>
 		(new Dedupe())
