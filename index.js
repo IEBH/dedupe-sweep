@@ -175,7 +175,7 @@ module.exports = class Dedupe extends EventEmitter {
 	// }}}
 
 	// Strategies {{{
-	strategies = {
+	static strategies = {
 		clark: require('./strategies/clark'),
 		doiOnly: require('./strategies/doiOnly'),
 	};
@@ -257,7 +257,7 @@ module.exports = class Dedupe extends EventEmitter {
 	* @emits runMutated Emitted when the fully mutated library is ready to start deduplicating
 	*/
 	run(input) {
-		var stratergy = this.strategies[this.settings.strategy];
+		var stratergy = Dedupe.strategies[this.settings.strategy];
 		var output;
 
 		return Promise.resolve()
@@ -271,8 +271,8 @@ module.exports = class Dedupe extends EventEmitter {
 			// Sanity checks {{{
 			.then(refs => {
 				if (!_.isArray(refs)) throw new Error('Input is not an array');
-				if (!_.has(this, ['strategies', this.settings.strategy])) throw new Error('Unknown stratergy specified');
-				if (!_.isArray(_.get(this, ['strategies', this.settings.strategy, 'steps']))) throw new Error('Invalid stratergy schema');
+				if (!_.has(Dedupe, ['strategies', this.settings.strategy])) throw new Error('Unknown stratergy specified');
+				if (!_.isArray(_.get(Dedupe, ['strategies', this.settings.strategy, 'steps']))) throw new Error('Invalid stratergy schema');
 				return output = refs;
 			})
 			// }}}
