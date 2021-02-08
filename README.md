@@ -37,6 +37,15 @@ await reflib.promises.outputFile('my-large-reference-library-deduped.xml', dedup
 ```
 
 
+Testing
+=======
+The various strategies within this project are tested using the [Systematic Reviews Data Sets for Testing Automation Tools](https://osf.io/dyvnj/) by Beller et. al and are available in the [test/data](./test/data) directory.
+
+Tests can be run via `npm test` or `mocha`. See the test directory for more information on specifics.
+
+Testing statistics are based on the methodology from [Evaluating automated deduplication tools: protocol](https://osf.io/w3mak/) by Hair et. al.
+
+
 API
 ===
 
