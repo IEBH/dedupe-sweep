@@ -92,7 +92,7 @@ module.exports = class Dedupe extends EventEmitter {
 		alphaNumericOnly: {
 			title: 'Alpha-Numeric only',
 			description: 'Remove all punctuation except characters and numbers',
-			handler: v => v.replace(/[^0-9a-z\s]+/g, ' '),
+			handler: v => v.replace(/[^0-9A-Za-z\s]+/g, ' '),
 		},
 		authorRewrite: {
 			title: 'Rewrite author names',
