@@ -69,10 +69,10 @@ strategies.forEach(strategy =>
 							}
 						});
 
-						mlog.log('Non-Dupe correct =', chalk.green(stats.nonDupeCorrect));
-						mlog.log('Non-Dupe wrong   =', stats.nonDupeWrong > 0 ? chalk.red(stats.nonDupeWrong) : chalk.green(0));
-						mlog.log('Dupe correct     =', chalk.green(stats.dupeCorrect));
-						mlog.log('Dupe wrong       =', stats.dupeWrong > 0 ? chalk.red(stats.dupeWrong) : chalk.green(0));
+						mlog.log('Non-Dupe correct (TN)=', chalk.green(stats.nonDupeCorrect));
+						mlog.log('Non-Dupe wrong   (FP)=', stats.nonDupeWrong > 0 ? chalk.red(stats.nonDupeWrong) : chalk.green(0));
+						mlog.log('Dupe correct     (TP)=', chalk.green(stats.dupeCorrect));
+						mlog.log('Dupe wrong       (FN)=', stats.dupeWrong > 0 ? chalk.red(stats.dupeWrong) : chalk.green(0));
 						mlog.log(chalk.gray('----------------------------------------'));
 
 						var precision = stats.dupeCorrect / (stats.dupeCorrect + stats.dupeWrong);
