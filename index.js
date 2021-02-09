@@ -30,6 +30,7 @@ module.exports = class Dedupe extends EventEmitter {
 		markOk: 'OK',
 		markDupe: 'DUPE',
 		dupeRef: 0,
+		fieldWeight: 0
 	};
 
 
@@ -51,6 +52,15 @@ module.exports = class Dedupe extends EventEmitter {
 		INDEX: 0,
 		RECNUMBER: 1,
 	};
+
+
+	/**
+	 * Avaliable field weighting systems to use
+	 */
+	static FIELDWEIGHT = {
+		MINUMUM: 0,
+		AVERAGE: 1
+	}
 
 
 	// Comparisons {{{
@@ -177,6 +187,8 @@ module.exports = class Dedupe extends EventEmitter {
 	// Strategies {{{
 	static strategies = {
 		clark: require('./strategies/clark'),
+		bramer: require('./strategies/bramer'),
+		forbes: require('./strategies/forbes'),
 		doiOnly: require('./strategies/doiOnly'),
 	};
 	// }}}
@@ -240,15 +252,34 @@ module.exports = class Dedupe extends EventEmitter {
 	* @param {Object} a The first reference to compare
 	* @param {Object} b The second reference to compare
 	* @param {Object} step The step object, specifying the rules for comparison
-	* @returns {number} A floating value representing the similarity between the two references for this steps rules
+	* @returns {number} A floating value representing the average similarity between the two references for this steps rules
 	*/
-	compareViaStep(a, b, step) {
+	compareViaStepAvg(a, b, step) {
 		return step.fields.reduce((result, field) =>
 			(step.skipOmitted ?? true ) && (!a[field] || !b[field])
 				? 0
 				: this.comparisons[step.comparison].handler(a[field], b[field])
 		, 0) / step.fields.length;
 	};
+
+	/**
+	* Compare two references at against rules specified in a step
+	* @param {Object} a The first reference to compare
+	* @param {Object} b The second reference to compare
+	* @param {Object} step The step object, specifying the rules for comparison
+	* @returns {number} A floating value representing the minumum similarity between the two references for this steps rules
+	*/
+	compareViaStepMin(a, b, step) {
+		let minumum = 1;
+		step.fields.forEach(field => {
+			let score = 
+				(step.skipOmitted ?? true ) && (!a[field] || !b[field])
+					? 0
+					: this.comparisons[step.comparison].handler(a[field], b[field])
+			if (score < minumum) minumum = score
+		})
+		return minumum;
+	}
 
 
 	/**
@@ -315,7 +346,9 @@ module.exports = class Dedupe extends EventEmitter {
 
 					for (var i = 0; i < sortedRefs.length - 1; i++) { // Walk all elements of the array...
 						// console.log('ITER', i);
-						var dupeScore = this.compareViaStep(sortedRefs[i], sortedRefs[i+1], step);
+						var dupeScore = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINUMUM
+							? this.compareViaStepMin(sortedRefs[i], sortedRefs[i+1], step)
+							: this.compareViaStepAvg(sortedRefs[i], sortedRefs[i+1], step);
 						if (dupeScore > 0) { // Hit a duplicate, `i` is now the index of the last unique ref
 							sortedRefs[i].dedupe.steps[stepIndex] = {score: 0};
 							sortedRefs[i+1].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
@@ -323,7 +356,9 @@ module.exports = class Dedupe extends EventEmitter {
 							var n = i + 1;
 							while (true) {
 								// console.log('COMP', i, '<=>', n, '/', sortedRefs.length);
-								var dupeScore2 = this.compareViaStep(sortedRefs[i], sortedRefs[n], step);
+								var dupeScore2 = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINUMUM
+									? this.compareViaStepMin(sortedRefs[i], sortedRefs[i+1], step)
+									: this.compareViaStepAvg(sortedRefs[i], sortedRefs[i+1], step);
 								if (dupeScore2 > 0) {
 									// console.log('DECLARE', n, 'DUPEOF', i);
 									sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore2, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};

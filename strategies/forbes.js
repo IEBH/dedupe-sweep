@@ -14,19 +14,19 @@ module.exports = {
 			comparison: 'exact',
 		},
 		{
-			fields: ['author', 'year', 'title', 'volume', 'issue', 'type'],
+			fields: ['title', 'volume'],
 			sort: 'title',
 			comparison: 'exact',
 		},
 		{
-			fields: ['title'],
+			fields: ['title', 'year'],
 			sort: 'title',
 			comparison: 'exact',
 		},
 		{
-			fields: ['author', 'year'],
-			sort: 'author',
-			comparison: 'exact',
-		},
+			fields: ['isbn', 'volume', 'pages'],
+			sort: 'isbn',
+			comparison: 'exact'
+		}
 	],
 };
