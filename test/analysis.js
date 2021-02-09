@@ -56,12 +56,12 @@ strategies.forEach(strategy =>
 							});
 							*/
 
-							if (!ref.caption && ref.result == 'OK') {
-								stats.nonDupeCorrect++;
+							if (ref.caption == 'Duplicate' && ref.result == 'DUPE') {
+								stats.dupeCorrect++;
 							} else if (!ref.caption && ref.result == 'DUPE') {
 								stats.nonDupeWrong++;
-							} else if (ref.caption == 'Duplicate' && ref.result == 'DUPE') {
-								stats.dupeCorrect++;
+							} else if (!ref.caption && ref.result == 'OK') {
+								stats.nonDupeCorrect++;
 							} else if (ref.caption == 'Duplicate' && ref.result != 'DUPE') {
 								stats.dupeWrong++;
 							} else if (ref.result == 'DUPE') { // Lib has ref as nonDupe but we detected dupe
