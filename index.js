@@ -177,6 +177,8 @@ module.exports = class Dedupe extends EventEmitter {
 	// Strategies {{{
 	static strategies = {
 		clark: require('./strategies/clark'),
+		bramer: require('./strategies/bramer'),
+		forbes: require('./strategies/forbes'),
 		doiOnly: require('./strategies/doiOnly'),
 	};
 	// }}}
@@ -334,7 +336,7 @@ module.exports = class Dedupe extends EventEmitter {
 
 					for (var i = 0; i < sortedRefs.length - 1; i++) { // Walk all elements of the array...
 						// console.log('ITER', i);
-						var dupeScore = this.compareViaStepAvg(sortedRefs[i], sortedRefs[i+1], step);
+						var dupeScore = this.compareViaStepMin(sortedRefs[i], sortedRefs[i+1], step);
 						if (dupeScore > 0) { // Hit a duplicate, `i` is now the index of the last unique ref
 							sortedRefs[i].dedupe.steps[stepIndex] = {score: 0};
 							sortedRefs[i+1].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
@@ -342,7 +344,7 @@ module.exports = class Dedupe extends EventEmitter {
 							var n = i + 1;
 							while (true) {
 								// console.log('COMP', i, '<=>', n, '/', sortedRefs.length);
-								var dupeScore2 = this.compareViaStepAvg(sortedRefs[i], sortedRefs[n], step);
+								var dupeScore2 = this.compareViaStepMin(sortedRefs[i], sortedRefs[n], step);
 								if (dupeScore2 > 0) {
 									// console.log('DECLARE', n, 'DUPEOF', i);
 									sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore2, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
