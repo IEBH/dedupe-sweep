@@ -25,7 +25,7 @@ module.exports = {
 		},
 		{
 			fields: ['author', 'year'],
-			sort: 'title',
+			sort: 'author',
 			comparison: 'exact',
 		},
 	],
