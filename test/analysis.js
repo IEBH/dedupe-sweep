@@ -69,15 +69,15 @@ strategies.forEach(strategy =>
 							}
 						});
 
-						mlog.log('Non-Dupe correct (TN)=', chalk.green(stats.nonDupeCorrect));
-						mlog.log('Non-Dupe wrong   (FP)=', stats.nonDupeWrong > 0 ? chalk.red(stats.nonDupeWrong) : chalk.green(0));
 						mlog.log('Dupe correct     (TP)=', chalk.green(stats.dupeCorrect));
+						mlog.log('Non-Dupe wrong   (FP)=', stats.nonDupeWrong > 0 ? chalk.red(stats.nonDupeWrong) : chalk.green(0));
+						mlog.log('Non-Dupe correct (TN)=', chalk.green(stats.nonDupeCorrect));
 						mlog.log('Dupe wrong       (FN)=', stats.dupeWrong > 0 ? chalk.red(stats.dupeWrong) : chalk.green(0));
 						mlog.log(chalk.gray('----------------------------------------'));
 
-						var precision = stats.dupeCorrect / (stats.dupeCorrect + stats.nonDupeWrong);
-						var recall = stats.dupeCorrect / (stats.dupeCorrect + stats.dupeWrong) || 1;
-						var score = 2 * ((precision * recall) / (precision + recall));
+						var precision = stats.dupeCorrect / (stats.dupeCorrect + stats.nonDupeWrong) || 0;
+						var recall = stats.dupeCorrect / (stats.dupeCorrect + stats.dupeWrong) || 0;
+						var score = 2 * ((precision * recall) / (precision + recall)) || 0;
 						mlog.log('Precision        =', chalk.yellow(precision));
 						mlog.log('Recall           =', chalk.yellow(recall));
 						mlog.log('F1 Score         =', chalk.bold.yellow(score));
