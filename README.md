@@ -67,7 +67,8 @@ Object storing all local settings for the class.
 | threshold         | number            | `0.1`      | Floating value (between 0 and 1) when marking or deleting refs automatically                                                        |
 | markOk            | string / function | `'OK'`     | String value to set the action field to when `actionField=='mark'` and the ref is a non-dupe, if a function it is called as `(ref)` |
 | markDupe          | string / function | `'DUPE'`   | String value to set the action field to when `actionField=='mark'` and the ref is a dupe, if a function it is called as `(ref)`     |
-| dupeRef           | string            | `0`        | How to refer to other refs when `actionfield=='stats'`. ENUM: DUPEREF                                                               |
+| dupeRef           | string            | `0`        | How to refer to other refs when `actionfield=='stats'`. ENUM: DUPEREF
+| fieldWeight       | number            | `0`        | How to calculate duplication score. ENUM: FIELDWEIGHT                                                                     |
 
 
 Static: Dedupe.ACTIONS
@@ -89,6 +90,16 @@ How to refer to other references.
 |-------|---------------|--------------------------------------------------------------|
 | `0`   | `'INDEX'`     | Refer to other references by their offset in the input array |
 | `1`   | `'RECNUMBER'` | Refer to other references by their `recnumber` field         |
+
+
+Static: Dedupe.FIELDWEIGHT
+----------------------
+How to refer to other references.
+
+| Value | Setting       | Description                                               |
+|-------|---------------|-----------------------------------------------------------|
+| `0`   | `'MINIMUM'`   | Calculate duplication score based on minumum field score  |
+| `1`   | `'AVERAGE'`   | Calculate duplication score based on average field score  |
 
 
 Dedupe.comparisons

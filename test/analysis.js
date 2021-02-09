@@ -43,6 +43,7 @@ strategies.forEach(strategy =>
 						.set('action', Dedupe.ACTIONS.MARK)
 						.set('strategy', strategy)
 						.set('actionField', 'result')
+						.set('fieldWeight', Dedupe.FIELDWEIGHT.MINUMUM)
 						.run(refs)
 					)
 					.then(refs => {
