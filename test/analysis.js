@@ -75,8 +75,8 @@ strategies.forEach(strategy =>
 						mlog.log('Dupe wrong       (FN)=', stats.dupeWrong > 0 ? chalk.red(stats.dupeWrong) : chalk.green(0));
 						mlog.log(chalk.gray('----------------------------------------'));
 
-						var precision = stats.dupeCorrect / (stats.dupeCorrect + stats.dupeWrong);
-						var recall = stats.dupeCorrect / (stats.dupeCorrect + stats.nonDupeWrong) || 1;
+						var precision = stats.dupeCorrect / (stats.dupeCorrect + stats.nonDupeWrong);
+						var recall = stats.dupeCorrect / (stats.dupeCorrect + stats.dupeWrong) || 1;
 						var score = 2 * ((precision * recall) / (precision + recall));
 						mlog.log('Precision        =', chalk.yellow(precision));
 						mlog.log('Recall           =', chalk.yellow(recall));
