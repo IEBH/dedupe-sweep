@@ -19,10 +19,12 @@ var strategies = process.env.STRATEGY
 var datasets = process.env.DATASET
 	? process.env.DATASET.split(/\s*,\s*/)
 	: [
-		`cytology-screening.xml`,
-		`haematology.xml`,
-		`respiratory.xml`,
-		`stroke.xml`,
+		// `cytology-screening.xml`,
+		// `haematology.xml`,
+		// `respiratory.xml`,
+		// `stroke.xml`,
+		// The below blue light library is verified as an accurate dataset by JC and CF
+		`blue-light.xml`
 	];
 
 /**
