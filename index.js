@@ -181,6 +181,20 @@ module.exports = class Dedupe extends EventEmitter {
 			description: 'Remove all wrapping brackets or other parenthesis, useful for translated titles',
 			handler: v => _.trim(v, '()[]{}'),
 		},
+		consistentPageNumbering: {
+			title: 'Mutate PubMed page numbering into consistent format',
+			description: 'E.g. 244-58 => 244-258',
+			handler: v => {
+				// Find page numbers
+				let pages = v.match(/^(\d+)(?:-(\d+))?$/);
+				// Find the difference in length of the page number strings
+				const offset = pages[1].length - pages[2].length;
+				// Take the prefix that is missing from the 2nd page number
+				const prefix = pages[1].substring(0, offset);
+				// Prepend the prefix to the page number
+				return `${ pages[1] }-${ prefix + pages[2] }`;
+			}
+		}
 	};
 	// }}}
 
