@@ -1,11 +1,12 @@
 module.exports = {
-	title: 'IEBH Deduplication Sweep',
-	description: 'IEBH recommended deduplication four step sweep method',
+	title: 'Forbes Automated Deduplication Sweep',
+	description: 'Deduplication Sweep with Low Rate of False Positives',
 	mutators: {
-		author: 'authorRewrite',
+		authors: 'authorRewrite',
 		doi: 'doiRewrite',
 		title: ['deburr', 'alphaNumericOnly', 'noCase'],
 		year: 'numericOnly',
+		pages: 'consistentPageNumbering'
 	},
 	steps: [
 		{
@@ -24,9 +25,19 @@ module.exports = {
 			comparison: 'exact',
 		},
 		{
-			fields: ['isbn', 'volume', 'pages'],
-			sort: 'isbn',
-			comparison: 'exact'
-		}
+			fields: ['pages', 'authors'],
+			sort: 'pages',
+			comparison: 'exact',
+		},
+		{
+			fields: ['pages', 'title'],
+			sort: 'pages',
+			comparison: 'exact',
+		},
+		{
+			fields: ['pages', 'journal', 'volume'],
+			sort: 'pages',
+			comparison: 'exact',
+		},
 	],
 };
