@@ -2,7 +2,7 @@ module.exports = {
 	title: 'Bramer et. al.',
 	description: '<a href="https://doi.org/10.3163/1536-5050.104.3.014">Bramer et. al.</a> deduplication sweep strategy',
 	mutators: {
-		author: 'authorRewrite',
+		authors: 'authorRewrite',
 		doi: 'doiRewrite',
 		title: ['deburr', 'alphaNumericOnly', 'noCase'],
 		year: 'numericOnly',
@@ -14,12 +14,12 @@ module.exports = {
 			comparison: 'exact',
 		},
 		{
-			fields: ['author', 'year', 'title', 'journal'],
+			fields: ['authors', 'year', 'title', 'journal'],
 			sort: 'title',
 			comparison: 'exact',
 		},
 		{
-			fields: ['author', 'year', 'title', 'pages'],
+			fields: ['authors', 'year', 'title', 'pages'],
 			sort: 'pages',
 			comparison: 'exact',
 		},

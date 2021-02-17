@@ -2,7 +2,7 @@ module.exports = {
 	title: 'IEBH Deduplication Sweep',
 	description: 'IEBH recommended deduplication four step sweep method',
 	mutators: {
-		author: 'authorRewrite',
+		authors: 'authorRewrite',
 		doi: 'doiRewrite',
 		title: ['deburr', 'alphaNumericOnly', 'noCase'],
 		year: 'numericOnly',
@@ -14,7 +14,7 @@ module.exports = {
 			comparison: 'exact',
 		},
 		{
-			fields: ['author', 'year', 'title', 'volume', 'issue', 'type'],
+			fields: ['authors', 'year', 'title', 'volume', 'issue', 'type'],
 			sort: 'title',
 			comparison: 'exact',
 		},
@@ -24,8 +24,8 @@ module.exports = {
 			comparison: 'exact',
 		},
 		{
-			fields: ['author', 'year'],
-			sort: 'author',
+			fields: ['authors', 'year'],
+			sort: 'authors',
 			comparison: 'exact',
 		},
 	],
