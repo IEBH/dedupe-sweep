@@ -6,6 +6,7 @@ module.exports = {
 		doi: 'doiRewrite',
 		title: ['deburr', 'alphaNumericOnly', 'noCase'],
 		year: 'numericOnly',
+		pages: 'consistentPageNumbering'
 	},
 	steps: [
 		{
