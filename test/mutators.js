@@ -50,7 +50,7 @@ describe('Mutators', ()=> {
 		expect(dedupe.mutators.removeEnclosingBrackets.handler('(One)')).to.equal('One');
 	});
 
-	it.only('consistentPageNumbering', ()=> {
+	it('consistentPageNumbering', ()=> {
 		expect(dedupe.mutators.consistentPageNumbering.handler('244-58')).to.equal('244-258');
 		expect(dedupe.mutators.consistentPageNumbering.handler('244-258')).to.equal('244-258');
 		expect(dedupe.mutators.consistentPageNumbering.handler('244-8')).to.equal('244-248');
