@@ -104,6 +104,11 @@ module.exports = class Dedupe extends EventEmitter {
 			description: 'Remove all punctuation except characters and numbers',
 			handler: v => v.replace(/[^0-9A-Za-z\s]+/g, ' '),
 		},
+		noSpace: {
+			title: 'Remove whitespace',
+			description: 'Remove all whitespace e.g " "',
+			handler: v => v.replace(/[\s]+/g, ''),
+		},
 		authorRewrite: {
 			title: 'Rewrite author names',
 			description: 'Clean up various author specifications into one standard format',
@@ -209,7 +214,7 @@ module.exports = class Dedupe extends EventEmitter {
 		clark: require('./strategies/clark'),
 		bramer: require('./strategies/bramer'),
 		forbes: require('./strategies/forbes'),
-		doiOnly: require('./strategies/doiOnly'),
+		// doiOnly: require('./strategies/doiOnly'),
 	};
 	// }}}
 

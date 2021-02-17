@@ -4,7 +4,7 @@ module.exports = {
 	mutators: {
 		authors: 'authorRewrite',
 		doi: 'doiRewrite',
-		title: ['deburr', 'alphaNumericOnly', 'noCase'],
+		title: ['deburr', 'alphaNumericOnly', 'noCase', 'noSpace'],
 		year: 'numericOnly',
 		pages: 'consistentPageNumbering'
 	},

@@ -9,6 +9,10 @@ describe('Mutators', ()=> {
 		expect(dedupe.mutators.alphaNumericOnly.handler('one$two_three()')).to.equal('one two three ');
 	});
 
+	it('noSpace', ()=> {
+		expect(dedupe.mutators.noSpace.handler('Test 	title and there  is  spacing')).to.equal('Testtitleandthereisspacing');
+	});
+
 	it('authorRewrite', ()=> {
 		expect(dedupe.mutators.authorRewrite.handler('Bill Gates')).to.equal('B. Gates');
 		expect(dedupe.mutators.authorRewrite.handler('William Henry Gates')).to.equal('W. Gates');
