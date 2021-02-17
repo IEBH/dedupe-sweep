@@ -54,6 +54,8 @@ describe('Mutators', ()=> {
 		expect(dedupe.mutators.consistentPageNumbering.handler('244-58')).to.equal('244-258');
 		expect(dedupe.mutators.consistentPageNumbering.handler('244-258')).to.equal('244-258');
 		expect(dedupe.mutators.consistentPageNumbering.handler('244-8')).to.equal('244-248');
+		expect(dedupe.mutators.consistentPageNumbering.handler('1')).to.equal('1');
+		expect(dedupe.mutators.consistentPageNumbering.handler('')).to.equal('');
 	});
 
 });

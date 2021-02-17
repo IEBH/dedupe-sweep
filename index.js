@@ -187,12 +187,18 @@ module.exports = class Dedupe extends EventEmitter {
 			handler: v => {
 				// Find page numbers
 				let pages = v.match(/^(\d+)(?:-(\d+))?$/);
-				// Find the difference in length of the page number strings
-				const offset = pages[1].length - pages[2].length;
-				// Take the prefix that is missing from the 2nd page number
-				const prefix = pages[1].substring(0, offset);
-				// Prepend the prefix to the page number
-				return `${ pages[1] }-${ prefix + pages[2] }`;
+				if (pages && pages[1] && pages[2]) {
+					// Find the difference in length of the page number strings
+					const offset = pages[1].length - pages[2].length;
+					// Take the prefix that is missing from the 2nd page number
+					const prefix = pages[1].substring(0, offset);
+					// Prepend the prefix to the page number
+					return `${ pages[1] }-${ prefix + pages[2] }`;
+				} else if (pages && pages[1]) {
+					return pages[1];
+				} else {
+					return "";
+				}
 			}
 		}
 	};
