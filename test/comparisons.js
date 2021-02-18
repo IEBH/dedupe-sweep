@@ -21,10 +21,10 @@ describe('Comparisons', ()=> {
 
 	it('jaroWinkler', ()=> {
 		expect(dedupe.comparisons.jaroWinkler.handler('one', 'one')).to.be.equal(1);
-		expect(dedupe.comparisons.jaroWinkler.handler('One', 'one')).to.be.equal(0);
-		expect(dedupe.comparisons.jaroWinkler.handler('one', 'on!')).to.be.equal(0.2);
+		expect(dedupe.comparisons.jaroWinkler.handler('One', 'one')).to.be.equal(0.7777777777777777);
+		expect(dedupe.comparisons.jaroWinkler.handler('one', 'on!')).to.be.equal(0.8222222222222222);
 		expect(dedupe.comparisons.jaroWinkler.handler('one', 'two')).to.be.equal(0);
-		expect(dedupe.comparisons.jaroWinkler.handler('onetwothree', 'onetXothree')).to.be.equal(0.4);
+		expect(dedupe.comparisons.jaroWinkler.handler('onetwothree', 'onetXothree')).to.be.equal(0.9636363636363636);
 	});
 
 });

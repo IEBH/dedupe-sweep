@@ -85,7 +85,7 @@ module.exports = class Dedupe extends EventEmitter {
 		jaroWinkler: {
 			title: 'Jaro-Winkler',
 			description: 'String distance / difference calculator using the [Jaro-Winkler metric](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)',
-			handler: (a, b) => natural.JaroWinklerDistance(a, b, false),
+			handler: (a, b) => natural.JaroWinklerDistance(a, b),
 		},
 	};
 	// }}}
@@ -214,7 +214,7 @@ module.exports = class Dedupe extends EventEmitter {
 		clark: require('./strategies/clark'),
 		bramer: require('./strategies/bramer'),
 		forbes: require('./strategies/forbes'),
-		// doiOnly: require('./strategies/doiOnly'),
+		doiOnly: require('./strategies/doiOnly'),
 	};
 	// }}}
 
