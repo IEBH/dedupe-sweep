@@ -401,16 +401,16 @@ module.exports = class Dedupe extends EventEmitter {
 							sortedRefs[i].dedupe.steps[stepIndex] = {score: this.settings.isTesting ? dupeScore : 0}; // Mark as duplicate if in testing mode
 							sortedRefs[i+1].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
 
-							var n = i + 1;
+							var n = i + 2;
 							while (true) {
 								// console.log('COMP', i, '<=>', n, '/', sortedRefs.length);
 								var dupeScore2 = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINUMUM
-									? this.compareViaStepMin(sortedRefs[i], sortedRefs[i+1], step)
-									: this.compareViaStepAvg(sortedRefs[i], sortedRefs[i+1], step);
+									? this.compareViaStepMin(sortedRefs[i], sortedRefs[n], step)
+									: this.compareViaStepAvg(sortedRefs[i], sortedRefs[n], step);
 								if (dupeScore2 > 0) {
 									// console.log('DECLARE', n, 'DUPEOF', i);
 									sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore2, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
-									i = n;
+									n += 1;
 								} else if (dupeScore <= 0) { // Hit next non-dupe - stop processing and move pointer to this non-dupe record
 									// console.log('NODUPE', n);
 									break;
