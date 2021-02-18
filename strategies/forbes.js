@@ -5,7 +5,7 @@ module.exports = {
 		authors: 'authorRewriteSingle',
 		doi: 'doiRewrite',
 		title: ['deburr', 'alphaNumericOnly', 'noCase', 'noSpace'],
-		journal: ['deburr', 'alphaNumericOnly', 'noCase', 'noSpace'],
+		journal: 'noCase',
 		year: 'numericOnly',
 		pages: 'consistentPageNumbering'
 	},
