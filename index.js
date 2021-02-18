@@ -152,6 +152,28 @@ module.exports = class Dedupe extends EventEmitter {
 				}
 			},
 		},
+		authorRewriteSingle: {
+			title: 'Rewrite singular author name',
+			description: 'Clean up various author specifications into one standard format',
+			handler: v => {
+				const name = v
+				var format = [
+					/^(?<last>[A-Z][a-z]+),+\s+(?<first>[A-Z])/, // Last, F. M.
+					/^(?<first>[A-Z][a-z]+)\s+(?<last>[A-Z][a-z]+)$/, //~= First Last
+					/^(?<first>[A-Z])\.?\s+(?<middle>.*?)\s*(?<last>[A-Z][a-z]+)$/, //~= F. Last
+					/^(?<first>[A-Z][a-z]+?)\s+(?<middle>.*?)\s*(?<last>[A-Z][a-z]+)$/, //~= First Middle Last
+					/^(?<last>[A-Z][a-z]+)\s+(?<middle>.*?)\s*(?<first>[A-Z]\.?)/, //~= Last F.
+				].reduce((matchingFormat, re) =>
+					matchingFormat // Already found a match
+					|| re.exec(name) // Attempt to match this element
+				, false);
+
+				return format ?
+					format.groups.first.substr(0, 1).toUpperCase() + '. '
+					+ _.upperFirst(format.groups.last)
+				: name;
+			},
+		},
 		deburr: {
 			title: 'Deburr',
 			description: 'Convert all <a href="https://en.wikipedia.org/wiki/Latin-1_Supplement_(Unicode_block)#Character_table">latin-1 supplementary letters</a> to basic latin letters and also remove <a href="https://en.wikipedia.org/wiki/Combining_Diacritical_Marks">combining diacritical marks</a>. e.g. <code>ÕÑÎÔÑ</code> becomes <code>ONION</code>',

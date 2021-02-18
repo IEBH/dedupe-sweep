@@ -30,6 +30,21 @@ describe('Mutators', ()=> {
 		expect(dedupe.mutators.authorRewrite.handler('Gates, B. H.; Balmer S. F.')).to.equal('B. Gates, S. Balmer');
 	});
 
+	it('authorRewriteSingle', ()=> {
+		expect(dedupe.mutators.authorRewriteSingle.handler('Bill Gates')).to.equal('B. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('William Henry Gates')).to.equal('W. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('B Gates')).to.equal('B. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('Gates B.')).to.equal('B. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('Gates B')).to.equal('B. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('Gates BH')).to.equal('B. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('W H Gates')).to.equal('W. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('Gates, B')).to.equal('B. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('Gates, Bill')).to.equal('B. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('Gates, B. H')).to.equal('B. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('Gates, B. H.')).to.equal('B. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('Gates, B. H. M')).to.equal('B. Gates');
+	});
+
 	it('deburr', ()=> {
 		expect(dedupe.mutators.deburr.handler('ÕÑÎÔÑ')).to.equal('ONION');
 	});
@@ -60,6 +75,8 @@ describe('Mutators', ()=> {
 		expect(dedupe.mutators.consistentPageNumbering.handler('244-8')).to.equal('244-248');
 		expect(dedupe.mutators.consistentPageNumbering.handler('1')).to.equal('1');
 		expect(dedupe.mutators.consistentPageNumbering.handler('')).to.equal('');
+		expect(dedupe.mutators.consistentPageNumbering.handler('445-59')).to.equal('445-459');
+		expect(dedupe.mutators.consistentPageNumbering.handler('445-459')).to.equal('445-459');
 	});
 
 });

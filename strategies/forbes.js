@@ -2,18 +2,20 @@ module.exports = {
 	title: 'Forbes Automated Deduplication Sweep',
 	description: 'Deduplication Sweep with Low Rate of False Positives',
 	mutators: {
-		authors: 'authorRewrite',
+		authors: 'authorRewriteSingle',
 		doi: 'doiRewrite',
 		title: ['deburr', 'alphaNumericOnly', 'noCase', 'noSpace'],
+		journal: ['deburr', 'alphaNumericOnly', 'noCase', 'noSpace'],
 		year: 'numericOnly',
 		pages: 'consistentPageNumbering'
 	},
 	steps: [
-		{
-			fields: ['doi'],
-			sort: 'doi',
-			comparison: 'exact',
-		},
+		// TODO: Doi does not seem to be working for now
+		// {
+		// 	fields: ['doi'],
+		// 	sort: 'doi',
+		// 	comparison: 'exact',
+		// },
 		{
 			fields: ['title', 'volume'],
 			sort: 'title',
