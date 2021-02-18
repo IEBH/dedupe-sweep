@@ -209,6 +209,11 @@ module.exports = class Dedupe extends EventEmitter {
 			description: 'Remove all wrapping brackets or other parenthesis, useful for translated titles',
 			handler: v => _.trim(v, '()[]{}'),
 		},
+		stripHtmlTags: {
+			title: 'Remove html/xml tags from title',
+			description: 'Remove html tag',
+			handler: v => v.replace(/(<([^>]+)>)/ig, ""),
+		},
 		consistentPageNumbering: {
 			title: 'Mutate PubMed page numbering into consistent format',
 			description: 'E.g. 244-58 => 244-258',
