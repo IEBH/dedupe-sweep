@@ -43,6 +43,8 @@ describe('Mutators', ()=> {
 		expect(dedupe.mutators.authorRewriteSingle.handler('Gates, B. H')).to.equal('B. Gates');
 		expect(dedupe.mutators.authorRewriteSingle.handler('Gates, B. H.')).to.equal('B. Gates');
 		expect(dedupe.mutators.authorRewriteSingle.handler('Gates, B. H. M')).to.equal('B. Gates');
+		expect(dedupe.mutators.authorRewriteSingle.handler('De Arruda, L. H. F')).to.equal('L. De Arruda');		
+		expect(dedupe.mutators.authorRewriteSingle.handler('de Arruda, L. H. F')).to.equal('L. De Arruda');		
 	});
 
 	it('deburr', ()=> {

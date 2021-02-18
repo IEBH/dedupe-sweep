@@ -158,7 +158,7 @@ module.exports = class Dedupe extends EventEmitter {
 			handler: v => {
 				const name = v
 				var format = [
-					/^(?<last>[A-Z][a-z]+),+\s+(?<first>[A-Z])/, // Last, F. M.
+					/^(?<last>[A-Za-z\s]+),+\s+(?<first>[A-Z])/, // Last, F. M.
 					/^(?<first>[A-Z][a-z]+)\s+(?<last>[A-Z][a-z]+)$/, //~= First Last
 					/^(?<first>[A-Z])\.?\s+(?<middle>.*?)\s*(?<last>[A-Z][a-z]+)$/, //~= F. Last
 					/^(?<first>[A-Z][a-z]+?)\s+(?<middle>.*?)\s*(?<last>[A-Z][a-z]+)$/, //~= First Middle Last
