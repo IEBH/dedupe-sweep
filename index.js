@@ -392,42 +392,40 @@ module.exports = class Dedupe extends EventEmitter {
 						sortedBy = step.sort;
 					}
 
-					for (var i = 0; i < sortedRefs.length - 1; i++) { // Walk all elements of the array...
-						// console.log('ITER', i);
+					var i = 0;
+					var n = i + 1;
+					while (n < sortedRefs.length) { // Walk all elements of the array...
 						var dupeScore = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINUMUM
-							? this.compareViaStepMin(sortedRefs[i], sortedRefs[i+1], step)
-							: this.compareViaStepAvg(sortedRefs[i], sortedRefs[i+1], step);
+							? this.compareViaStepMin(sortedRefs[i], sortedRefs[n], step)
+							: this.compareViaStepAvg(sortedRefs[i], sortedRefs[n], step);
 						if (dupeScore > 0) { // Hit a duplicate, `i` is now the index of the last unique ref
-							sortedRefs[i].dedupe.steps[stepIndex] = {score: this.settings.isTesting ? dupeScore : 0}; // Mark as duplicate if in testing mode
-							sortedRefs[i+1].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
-
-							var n = i + 2;
-							while (true) {
-								// console.log('COMP', i, '<=>', n, '/', sortedRefs.length);
-								var dupeScore2 = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINUMUM
-									? this.compareViaStepMin(sortedRefs[i], sortedRefs[n], step)
-									: this.compareViaStepAvg(sortedRefs[i], sortedRefs[n], step);
-								if (dupeScore2 > 0) {
-									// console.log('DECLARE', n, 'DUPEOF', i);
-									sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore2, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
-									n += 1;
-								} else if (dupeScore <= 0) { // Hit next non-dupe - stop processing and move pointer to this non-dupe record
-									// console.log('NODUPE', n);
-									break;
-								}
-
-								if (n >= sortedRefs.length - 1) { // Exhausted iteration - set outer pointer to end
-									// console.log('EXHAUST', n);
-									break;
-								}
-
-								n++; // Continue iterating
+							// If score does not currently exist for record (i.e. original record) assign it a score of 0 (unless testing)
+							if (!sortedRefs[i].dedupe.steps[stepIndex]) {
+								sortedRefs[i].dedupe.steps[stepIndex] = {score: this.settings.isTesting ? dupeScore : 0}; // Mark as duplicate if in testing mode
+							}
+							// Mark 2nd record as duplicate and link to original
+							sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
+							n++; // Increment n by one to compare next record with original to check for multiple dupes
+							if (n >= sortedRefs.length) { // If at last record increment i for consistent behaviour
+								i++;
+								n = i + 1;
 							}
 						} else {
-							sortedRefs[i].dedupe[`step${stepIndex}`] = {score: 0};
+							if (sortedRefs[i][step.sort] === sortedRefs[n][step.sort]) { // If still the same value for sorted value
+								n++; // Increment n by one to compare next record with original to check for multiple dupes
+								if (n >= sortedRefs.length) { // If at last record increment i for consistent behaviour
+									i++;
+									n = i + 1;
+								}
+							} else {
+								// The below may work better if some records are missing data but at the expense of time
+								i++;
+								n = i + 1;
+								// i = n; // Set the new pointer to be the non-matching reference
+								// n += 1; // Increment n to point to next reference
+							}
 						}
 					}
-					// console.log(`//// END OF STEP ${stepIndex} ////`);
 				});
 
 				return refs;
