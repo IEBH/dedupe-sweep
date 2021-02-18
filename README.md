@@ -60,15 +60,16 @@ Object storing all local settings for the class.
 
 | Setting           | Type              | Default    | Description                                                                                                                         |
 |-------------------|-------------------|------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| stratergy         | string            | `'clark'`  | The stratergy to use on the next `run()` call                                                                                       |
-| validateStratergy | boolean           | `true`     | Validate the strategy before beginning, only disable this if you are sure the strategy is valid                                     |
-| action            | string            | '`0`'      | The action to take when detecting a duplicate. ENUM: ACTIONS                                                                        |
-| actionField       | string            | `'dedupe'` | The field to use with actions                                                                                                       |
-| threshold         | number            | `0.1`      | Floating value (between 0 and 1) when marking or deleting refs automatically                                                        |
+| stratergy         | string            | `'clark'`  | The stratergy to use on the next `run()` |
+| validateStratergy | boolean           | `true`     | Validate the strategy before beginning, only disable this if you are sure the strategy is valid |
+| action            | string            | '`0`'      | The action to take when detecting a duplicate. ENUM: ACTIONS |
+| actionField       | string            | `'dedupe'` | The field to use with actions |
+| threshold         | number            | `0.1`      | Floating value (between 0 and 1) when marking or deleting refs automatically |
 | markOk            | string / function | `'OK'`     | String value to set the action field to when `actionField=='mark'` and the ref is a non-dupe, if a function it is called as `(ref)` |
-| markDupe          | string / function | `'DUPE'`   | String value to set the action field to when `actionField=='mark'` and the ref is a dupe, if a function it is called as `(ref)`     |
-| dupeRef           | string            | `0`        | How to refer to other refs when `actionfield=='stats'`. ENUM: DUPEREF
-| fieldWeight       | number            | `0`        | How to calculate duplication score. ENUM: FIELDWEIGHT                                                                     |
+| markDupe          | string / function | `'DUPE'`   | String value to set the action field to when `actionField=='mark'` and the ref is a dupe, if a function it is called as `(ref)` |
+| dupeRef           | string            | `0`        | How to refer to other refs when `actionfield=='stats'`. ENUM: DUPEREF |
+| fieldWeight       | number            | `0`        | How to calculate duplication score. ENUM: FIELDWEIGHT |
+| isTesting         | boolean           | `false`    | Whether to mark the original as a duplicate or not |
 
 
 Static: Dedupe.ACTIONS

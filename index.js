@@ -30,7 +30,8 @@ module.exports = class Dedupe extends EventEmitter {
 		markOk: 'OK',
 		markDupe: 'DUPE',
 		dupeRef: 0,
-		fieldWeight: 0
+		fieldWeight: 0,
+		isTesting: false,
 	};
 
 
@@ -375,7 +376,7 @@ module.exports = class Dedupe extends EventEmitter {
 							? this.compareViaStepMin(sortedRefs[i], sortedRefs[i+1], step)
 							: this.compareViaStepAvg(sortedRefs[i], sortedRefs[i+1], step);
 						if (dupeScore > 0) { // Hit a duplicate, `i` is now the index of the last unique ref
-							sortedRefs[i].dedupe.steps[stepIndex] = {score: 0};
+							sortedRefs[i].dedupe.steps[stepIndex] = {score: this.settings.isTesting ? dupeScore : 0}; // Mark as duplicate if in testing mode
 							sortedRefs[i+1].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
 
 							var n = i + 1;
