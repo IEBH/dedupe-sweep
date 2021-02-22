@@ -219,16 +219,16 @@ module.exports = class Dedupe extends EventEmitter {
 			description: 'E.g. 244-58 => 244-258',
 			handler: v => {
 				// Find page numbers
-				let pages = v.match(/^(\d+)(?:-(\d+))?$/);
-				if (pages && pages[1] && pages[2]) {
+				let pages = /^(?<from>\d+)\s*(\p{Pd}+(?<to>\d+)\s*)?$/u.exec(v)?.groups;
+				if (pages && pages.from && pages.to) {
 					// Find the difference in length of the page number strings
-					const offset = pages[1].length - pages[2].length;
+					const offset = pages.from.length - pages.to.length;
 					// Take the prefix that is missing from the 2nd page number
-					const prefix = pages[1].substring(0, offset);
+					const prefix = pages.from.substring(0, offset);
 					// Prepend the prefix to the page number
-					return `${ pages[1] }-${ prefix + pages[2] }`;
-				} else if (pages && pages[1]) {
-					return pages[1];
+					return `${ pages.from }-${ prefix + pages.to }`;
+				} else if (pages && pages.from) {
+					return pages.from;
 				} else {
 					return "";
 				}
@@ -325,7 +325,7 @@ module.exports = class Dedupe extends EventEmitter {
 	compareViaStepMin(a, b, step) {
 		let minumum = 1;
 		step.fields.forEach(field => {
-			let score = 
+			let score =
 				(step.skipOmitted ?? true ) && (!a[field] || !b[field])
 					? 0
 					: this.comparisons[step.comparison].handler(a[field], b[field])
