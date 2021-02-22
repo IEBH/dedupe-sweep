@@ -88,6 +88,11 @@ module.exports = class Dedupe extends EventEmitter {
 			description: 'String distance / difference calculator using the [Jaro-Winkler metric](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)',
 			handler: (a, b) => natural.JaroWinklerDistance(a, b),
 		},
+		random: {
+			title: 'Random',
+			description: 'Ignore comparisons and pick a number between 0 and 1',
+			handler: (a, b) => _.random(0, 1, true),
+		},
 	};
 	// }}}
 
