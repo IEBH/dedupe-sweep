@@ -24,7 +24,12 @@ var datasets = process.env.DATASET
 		// `respiratory.xml`,
 		// `stroke.xml`,
 		// The below blue light library is verified as an accurate dataset by JC and CF
-		`blue-light.xml`
+		`blue-light.xml`,
+		// Libraries done by JC
+		'copper-jc.xml',
+		'diabetes-jc.xml',
+		'tafe-jc.xml',
+		'uti-jc.xml'
 	];
 
 /**
