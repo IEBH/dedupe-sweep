@@ -28,7 +28,7 @@ var datasets = process.env.DATASET
 		// Libraries done by JC
 		'copper-jc.xml',
 		'diabetes-jc.xml',
-		'tafe-jc.xml',
+		'tafenoquine-jc.xml',
 		'uti-jc.xml'
 	];
 
