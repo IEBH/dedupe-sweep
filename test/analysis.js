@@ -25,11 +25,11 @@ var datasets = process.env.DATASET
 		// `stroke.xml`,
 		// The below blue light library is verified as an accurate dataset by JC and CF
 		`blue-light.xml`,
-		// Libraries done by JC
-		'copper-jc.xml',
-		'diabetes-jc.xml',
-		'tafenoquine-jc.xml',
-		'uti-jc.xml'
+		// The below libraries are verified as accurate by JC and HG
+		'copper.xml',
+		'diabetes.xml',
+		'tafenoquine.xml',
+		'uti.xml',
 	];
 
 /**

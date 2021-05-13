@@ -10,7 +10,7 @@ module.exports = {
 		pages: 'consistentPageNumbering'
 	},
 	steps: [
-		// TODO: Doi does not seem to be working for now
+		// Higher accuracy without doi
 		// {
 		// 	fields: ['doi'],
 		// 	sort: 'doi',
