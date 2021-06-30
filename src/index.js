@@ -20,6 +20,8 @@ module.exports = class Dedupe extends EventEmitter {
 	* @property {string|function} markOk String value to set the action field to when `actionField=='mark'` and the ref is a non-dupe, if a function it is called as `(ref)`
 	* @property {string|function} markDupe String value to set the action field to when `actionField=='mark'` and the ref is a dupe, if a function it is called as `(ref)`
 	* @property {string} dupeRef How to refer to other refs when `actionfield=='stats'`. ENUM: DUPEREF
+	* @property {string} fieldWeight Whether to use the minimum score between fields or the average when deciding if dupe
+	* @property {string} markOriginal Whether mark the original duplicate as a dupe or not
 	*/
 	settings = {
 		strategy: 'clark',
@@ -31,7 +33,7 @@ module.exports = class Dedupe extends EventEmitter {
 		markDupe: 'DUPE',
 		dupeRef: 0,
 		fieldWeight: 0,
-		isTesting: false,
+		markOriginal: false,
 	};
 
 
@@ -411,7 +413,7 @@ module.exports = class Dedupe extends EventEmitter {
 						if (dupeScore > 0) { // Hit a duplicate, `i` is now the index of the last unique ref
 							// If score does not currently exist for record (i.e. original record) assign it a score of 0 (unless testing)
 							if (!sortedRefs[i].dedupe.steps[stepIndex]) {
-								sortedRefs[i].dedupe.steps[stepIndex] = {score: this.settings.isTesting ? dupeScore : 0}; // Mark as duplicate if in testing mode
+								sortedRefs[i].dedupe.steps[stepIndex] = {score: this.settings.markOriginal ? dupeScore : 0}; // Mark as duplicate if in testing mode
 							}
 							// Mark 2nd record as duplicate and link to original
 							sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
