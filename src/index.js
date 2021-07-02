@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
-var natural = require('natural');
+var jaroWinklerDistance = require('jaro-winkler');
 
 
 /**
@@ -88,7 +88,7 @@ module.exports = class Dedupe extends EventEmitter {
 		jaroWinkler: {
 			title: 'Jaro-Winkler',
 			description: 'String distance / difference calculator using the [Jaro-Winkler metric](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)',
-			handler: (a, b) => natural.JaroWinklerDistance(a, b),
+			handler: (a, b) => jaroWinklerDistance(a, b),
 		},
 		random: {
 			title: 'Random',
