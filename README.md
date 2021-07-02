@@ -69,7 +69,7 @@ Object storing all local settings for the class.
 | markDupe          | string / function | `'DUPE'`   | String value to set the action field to when `actionField=='mark'` and the ref is a dupe, if a function it is called as `(ref)` |
 | dupeRef           | string            | `0`        | How to refer to other refs when `actionfield=='stats'`. ENUM: DUPEREF |
 | fieldWeight       | number            | `0`        | How to calculate duplication score. ENUM: FIELDWEIGHT |
-| isTesting         | boolean           | `false`    | Whether to mark the original as a duplicate or not |
+| markOriginal      | boolean           | `false`    | Whether to mark the original as a duplicate or not |
 
 
 Static: Dedupe.ACTIONS
