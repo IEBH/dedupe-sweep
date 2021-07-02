@@ -415,8 +415,16 @@ module.exports = class Dedupe extends EventEmitter {
 							if (!sortedRefs[i].dedupe.steps[stepIndex]) {
 								sortedRefs[i].dedupe.steps[stepIndex] = {score: this.settings.markOriginal ? dupeScore : 0}; // Mark as duplicate if in testing mode
 							}
-							// Mark 2nd record as duplicate and link to original
-							sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
+							// If score does not exist for second record, update score
+							if (!sortedRefs[n].dedupe.steps[stepIndex]) {
+								// Mark 2nd record as duplicate and link to original
+								sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
+							}
+							// Else if new score is greater than or equal the one which exists, update score and dupeof
+							else if (dupeScore >= sortedRefs[n].dedupe.steps[stepIndex].score) {
+								// Mark 2nd record as duplicate and link to original
+								sortedRefs[n].dedupe.steps[stepIndex] = {score: dupeScore, dupeOf: this.settings.dupeRef == Dedupe.DUPEREF.RECNUMBER ? sortedRefs[i].recNumber : sortedRefs[i].index};
+							}
 							n++; // Increment n by one to compare next record with original to check for multiple dupes
 							if (n >= sortedRefs.length) { // If at last record increment i for consistent behaviour
 								i++;
