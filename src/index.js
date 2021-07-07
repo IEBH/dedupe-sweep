@@ -341,6 +341,10 @@ module.exports = class Dedupe extends EventEmitter {
 		return minumum;
 	}
 
+	/**
+	 * Emit progress throttled every 100ms
+	 * @param {number} progress Number between 0 and 1 (inclusive) which represents the progress
+	 */
 	emitProgress = _.throttle(function(progress) {
 		this.emit('progress', progress);
 	}, 100);
