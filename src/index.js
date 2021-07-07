@@ -407,6 +407,11 @@ module.exports = class Dedupe extends EventEmitter {
 					var i = 0;
 					var n = i + 1;
 					while (n < sortedRefs.length) { // Walk all elements of the array...
+						// Emit progress
+						_.throttle(
+							this.emit('progress', (stepIndex * sortedRefs.length + i) / (stratergy.steps.length * sortedRefs.length)),
+							100
+						);
 						var dupeScore = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINUMUM
 							? this.compareViaStepMin(sortedRefs[i], sortedRefs[n], step)
 							: this.compareViaStepAvg(sortedRefs[i], sortedRefs[n], step);
@@ -446,6 +451,7 @@ module.exports = class Dedupe extends EventEmitter {
 							}
 						}
 					}
+					this.emit('progress', 1);
 				});
 
 				return refs;
