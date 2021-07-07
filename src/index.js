@@ -455,7 +455,6 @@ module.exports = class Dedupe extends EventEmitter {
 						}
 					}
 				});
-				this.emitProgress(1);
 				return refs;
 			})
 			.then(refs => refs.map(ref => ({
