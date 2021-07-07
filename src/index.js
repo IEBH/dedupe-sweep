@@ -347,7 +347,7 @@ module.exports = class Dedupe extends EventEmitter {
 	 */
 	emitProgress = _.throttle(function(progress) {
 		this.emit('progress', progress);
-	}, 100);
+	}, 100, { trailing: false });
 
 
 	/**
