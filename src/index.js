@@ -341,6 +341,10 @@ module.exports = class Dedupe extends EventEmitter {
 		return minumum;
 	}
 
+	emitProgress = _.throttle(function(progress) {
+		this.emit('progress', progress);
+	}, 100);
+
 
 	/**
 	* Run the deduplication process
@@ -378,6 +382,7 @@ module.exports = class Dedupe extends EventEmitter {
 				throw new Error('Invalid stratergy - ' + sErrs.join(', '));
 			})
 			// }}}
+			// Run mutators {{{
 			.then(()=> {
 				var refs = output;
 				return refs.map((original, index) => ({
@@ -393,6 +398,7 @@ module.exports = class Dedupe extends EventEmitter {
 					),
 				}));
 			})
+			// }}}
 			.then(refs => {
 				this.emit('runMutated', refs);
 				var sortedBy; // Keep track of our sort so we don't repeat this
@@ -408,10 +414,7 @@ module.exports = class Dedupe extends EventEmitter {
 					var n = i + 1;
 					while (n < sortedRefs.length) { // Walk all elements of the array...
 						// Emit progress
-						_.throttle(
-							() => this.emit('progress', (stepIndex * sortedRefs.length + i) / (stratergy.steps.length * sortedRefs.length)),
-							100
-						);
+						this.emitProgress((stepIndex * sortedRefs.length + i) / (stratergy.steps.length * sortedRefs.length))
 						var dupeScore = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINUMUM
 							? this.compareViaStepMin(sortedRefs[i], sortedRefs[n], step)
 							: this.compareViaStepAvg(sortedRefs[i], sortedRefs[n], step);
@@ -451,9 +454,8 @@ module.exports = class Dedupe extends EventEmitter {
 							}
 						}
 					}
-					this.emit('progress', 1);
 				});
-
+				this.emitProgress(1);
 				return refs;
 			})
 			.then(refs => refs.map(ref => ({

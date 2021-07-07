@@ -1,10 +1,10 @@
 {
   "name": "@iebh/dedupe-sweep",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Deduplicate reference libraries using the sweep method",
   "main": "lib/index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "npm run build && mocha",
     "build": "babel src -d lib"
   },
   "repository": {
