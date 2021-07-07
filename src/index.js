@@ -409,7 +409,7 @@ module.exports = class Dedupe extends EventEmitter {
 					while (n < sortedRefs.length) { // Walk all elements of the array...
 						// Emit progress
 						_.throttle(
-							this.emit('progress', (stepIndex * sortedRefs.length + i) / (stratergy.steps.length * sortedRefs.length)),
+							() => this.emit('progress', (stepIndex * sortedRefs.length + i) / (stratergy.steps.length * sortedRefs.length)),
 							100
 						);
 						var dupeScore = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINUMUM
