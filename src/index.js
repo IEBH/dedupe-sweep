@@ -345,8 +345,8 @@ module.exports = class Dedupe extends EventEmitter {
 	 * Emit progress throttled every 100ms
 	 * @param {number} progress Number between 0 and 1 (inclusive) which represents the progress
 	 */
-	emitProgress = _.throttle(function(progress) {
-		this.emit('progress', progress);
+	emitProgress = _.throttle(function(current, max) {
+		this.emit('progress', current, max);
 	}, 100, { trailing: false });
 
 
@@ -418,7 +418,7 @@ module.exports = class Dedupe extends EventEmitter {
 					var n = i + 1;
 					while (n < sortedRefs.length) { // Walk all elements of the array...
 						// Emit progress
-						this.emitProgress((stepIndex * sortedRefs.length + i) / (stratergy.steps.length * sortedRefs.length))
+						this.emitProgress(stepIndex * sortedRefs.length + i, stratergy.steps.length * sortedRefs.length)
 						var dupeScore = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINUMUM
 							? this.compareViaStepMin(sortedRefs[i], sortedRefs[n], step)
 							: this.compareViaStepAvg(sortedRefs[i], sortedRefs[n], step);
