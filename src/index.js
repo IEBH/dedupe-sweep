@@ -249,6 +249,7 @@ module.exports = class Dedupe extends EventEmitter {
 		clark: require('./strategies/clark'),
 		bramer: require('./strategies/bramer'),
 		forbes: require('./strategies/forbes'),
+		forbesImproved: require('./strategies/forbesImproved'),
 		doiOnly: require('./strategies/doiOnly'),
 	};
 	// }}}
