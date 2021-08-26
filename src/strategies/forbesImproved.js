@@ -4,7 +4,7 @@ module.exports = {
 	mutators: {
 		authors: 'authorRewriteSingle',
 		doi: 'doiRewrite',
-		title: ['stripHtmlTags', 'deburr', 'alphaNumericOnly', 'noCase', 'noSpace'],
+		title: ['stripHtmlTags', 'alphaNumericOnly', 'noCase', 'noSpace'],
 		journal: 'noCase',
 		year: 'numericOnly',
 		pages: 'consistentPageNumbering'
@@ -18,6 +18,11 @@ module.exports = {
 		},
 		{
 			fields: ['doi', 'title'],
+			sort: 'doi',
+			comparison: 'exact',
+		},
+		{
+			fields: ['doi', 'authors'],
 			sort: 'doi',
 			comparison: 'exact',
 		},
