@@ -39,6 +39,9 @@ var datasets = process.env.DATASET
 */
 var scores = {};
 
+/** Threshold for dupe */
+const threshold = 0.01
+
 strategies.forEach(strategy =>
 	describe(`${strategy} strategy`, ()=> {
 		datasets.forEach(dataset =>
@@ -49,10 +52,11 @@ strategies.forEach(strategy =>
 					.then(()=> reflib.promises.parseFile(`${__dirname}/data/${dataset}`))
 					.then(refs => (new Dedupe())
 						.set('validateStratergy', false)
-						.set('action', Dedupe.ACTIONS.MARK)
+						.set('action', Dedupe.ACTIONS.STATS)
 						.set('strategy', strategy)
 						.set('actionField', 'result')
 						.set('fieldWeight', Dedupe.FIELDWEIGHT.MINUMUM)
+						.set('threshold', threshold)
 						.set('markOriginal', true)
 						.run(refs)
 					)
@@ -67,13 +71,26 @@ strategies.forEach(strategy =>
 							});
 							*/
 
-							if (ref.caption == 'Duplicate' && ref.result == 'DUPE') {
+							if (ref.caption == 'Duplicate' && ref.result.score > threshold) {
 								stats.dupeCorrect++;
-							} else if (!ref.caption && ref.result == 'DUPE') {
+							} else if (!ref.caption && ref.result.score > threshold) {
+								// Print false positive dupe along with its dupeOf
+								var dupeOf = null;
+								if (ref.result.dupeOf && ref.result.dupeOf[0]) {
+									dupeOf = refs[ref.result.dupeOf[0]]
+								}
+								else {
+									dupeOf = refs.find(reference => reference.result.dupeOf && (reference.result.dupeOf[0] == index));
+								}
+								console.log("Title:", ref.title);
+								if (dupeOf && dupeOf.title) {
+									console.log("Dupe Title:", dupeOf.title);
+								}
+								console.log("\n");
 								stats.nonDupeWrong++;
-							} else if (!ref.caption && ref.result == 'OK') {
+							} else if (!ref.caption && ref.result.score < threshold) {
 								stats.nonDupeCorrect++;
-							} else if (ref.caption == 'Duplicate' && ref.result != 'DUPE') {
+							} else if (ref.caption == 'Duplicate' && ref.result.score < threshold) {
 								stats.dupeWrong++;
 							} else if (ref.result == 'DUPE') { // Lib has ref as nonDupe but we detected dupe
 								throw new Error(`Mismatched field comparison: caption=${ref.caption}, result=${ref.result}`);
