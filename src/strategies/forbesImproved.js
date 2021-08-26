@@ -3,8 +3,9 @@ module.exports = {
 	description: 'Deduplication Sweep with Low Rate of False Positives',
 	mutators: {
 		authors: 'authorRewriteSingle',
-		doi: 'doiRewrite',
+		doi: ['doiRewrite', 'noCase'],
 		title: ['stripHtmlTags', 'alphaNumericOnly', 'noCase', 'noSpace'],
+		abstract: ['stripHtmlTags', 'alphaNumericOnly', 'noCase', 'noSpace'],
 		journal: 'noCase',
 		year: 'numericOnly',
 		pages: 'consistentPageNumbering'
@@ -23,6 +24,11 @@ module.exports = {
 		},
 		{
 			fields: ['doi', 'authors'],
+			sort: 'doi',
+			comparison: 'exact',
+		},
+		{
+			fields: ['doi', 'abstract'],
 			sort: 'doi',
 			comparison: 'exact',
 		},
