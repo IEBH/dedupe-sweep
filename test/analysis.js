@@ -16,6 +16,8 @@ var strategies = process.env.STRATEGY
 	? process.env.STRATEGY.split(/\s*,\s*/)
 	: Object.keys(Dedupe.strategies);
 
+strategies = ['forbesImproved'];
+
 var datasets = process.env.DATASET
 	? process.env.DATASET.split(/\s*,\s*/)
 	: [
