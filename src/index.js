@@ -78,7 +78,12 @@ module.exports = class Dedupe extends EventEmitter {
 		exact: {
 			title: 'Exact comparison',
 			description: 'Simple character-by-character exact comaprison',
-			handler: (a, b) => a == b ? 1 : 0,
+			handler: (a, b) => {
+				if (Array.isArray(a) && Array.isArray(b)) {
+					return JSON.stringify(a) == JSON.stringify(b);
+				}
+				return a == b ? 1 : 0
+			},
 		},
 		exactTruncate: {
 			title: 'Exact comparison with truncate',
@@ -466,6 +471,7 @@ module.exports = class Dedupe extends EventEmitter {
 				...ref,
 				dedupe: {
 					...ref.dedupe,
+					// Average score for dupes
 					score: ref.dedupe.steps.length > 0 ? _.sum(ref.dedupe.steps.map(s => s.score)) / ref.dedupe.steps.length : 0,
 				},
 			})))
