@@ -53,6 +53,11 @@ module.exports = {
 			comparison: 'exact',
 		},
 		{
+			fields: ['title', 'journal', 'year'],
+			sort: 'title',
+			comparison: 'exactTruncate',
+		},
+		{
 			fields: ['pages', 'journal', 'volume', 'authors'],
 			sort: 'pages',
 			comparison: 'exact',
