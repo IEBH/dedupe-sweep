@@ -28,8 +28,8 @@ module.exports = {
 			comparison: 'exact',
 		},
 		{
-			fields: ['doi', 'abstract'],
-			sort: 'doi',
+			fields: ['abstract'],
+			sort: 'abstract',
 			comparison: 'exact',
 		},
 		{
