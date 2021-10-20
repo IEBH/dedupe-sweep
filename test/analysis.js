@@ -16,7 +16,7 @@ var strategies = process.env.STRATEGY
 	? process.env.STRATEGY.split(/\s*,\s*/)
 	: Object.keys(Dedupe.strategies);
 
-strategies = ['forbesImproved'];
+strategies = ['forbes', 'forbesMinFN', 'forbesMinFP'];
 
 var datasets = process.env.DATASET
 	? process.env.DATASET.split(/\s*,\s*/)
@@ -63,6 +63,7 @@ strategies.forEach(strategy =>
 					.then(refs => {
 						var stats = {nonDupeCorrect: 0, nonDupeWrong: 0, dupeCorrect: 0, dupeWrong: 0};
 						refs.forEach((ref, index, refs) => {
+							// Log false negative
 							/*
 							ref.result = ref.result.score > 0.8 ? 'DUPE' : 'OK';
 							console.log('FALSE NEGATIVE', {
@@ -82,11 +83,15 @@ strategies.forEach(strategy =>
 								else {
 									dupeOf = refs.find(reference => reference.result.dupeOf && (reference.result.dupeOf[0] == index));
 								}
-								console.log("Title:", ref.title);
-								if (dupeOf && dupeOf.title) {
-									console.log("Dupe Title:", dupeOf.title);
-								}
-								console.log("\n");
+								// Log False Positive
+								// console.log("False positive")
+								// console.log("Ref:", ref.title);
+								// console.log(ref);
+								// if (dupeOf) {
+								// 	console.log("Dupe:", dupeOf.title);
+								// 	console.log(dupeOf);
+								// }
+								// console.log("\n");
 								stats.nonDupeWrong++;
 							} else if (!ref.caption && ref.result.score < threshold) {
 								stats.nonDupeCorrect++;
