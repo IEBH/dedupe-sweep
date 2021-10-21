@@ -63,14 +63,13 @@ strategies.forEach(strategy =>
 					.then(refs => {
 						var stats = {nonDupeCorrect: 0, nonDupeWrong: 0, dupeCorrect: 0, dupeWrong: 0};
 						refs.forEach((ref, index, refs) => {
-							// Log false negative
-							/*
-							ref.result = ref.result.score > 0.8 ? 'DUPE' : 'OK';
-							console.log('FALSE NEGATIVE', {
-								ref,
-								dupeOf: ref.result.dupeOf.map(i => refs[i]),
-							});
-							*/
+							// Log false negative {{{
+							// ref.result = ref.result.score > 0.8 ? 'DUPE' : 'OK';
+							// console.log('FALSE NEGATIVE', {
+							// 	ref,
+							// 	dupeOf: ref.result.dupeOf.map(i => refs[i]),
+							// });
+							// }}}
 
 							if (ref.caption == 'Duplicate' && ref.result.score > threshold) {
 								stats.dupeCorrect++;
@@ -83,7 +82,7 @@ strategies.forEach(strategy =>
 								else {
 									dupeOf = refs.find(reference => reference.result.dupeOf && (reference.result.dupeOf[0] == index));
 								}
-								// Log False Positive
+								// Log False Positive {{{
 								// console.log("False positive")
 								// console.log("Ref:", ref.title);
 								// console.log(ref);
@@ -92,6 +91,7 @@ strategies.forEach(strategy =>
 								// 	console.log(dupeOf);
 								// }
 								// console.log("\n");
+								// }}}
 								stats.nonDupeWrong++;
 							} else if (!ref.caption && ref.result.score < threshold) {
 								stats.nonDupeCorrect++;

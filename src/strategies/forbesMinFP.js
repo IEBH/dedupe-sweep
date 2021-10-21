@@ -17,7 +17,7 @@ module.exports = {
 		// 	comparison: 'exact',
 		// },
 		{
-			fields: ['title', 'volume'],
+			fields: ['title', 'volume','authors'],
 			sort: 'title',
 			comparison: 'exact',
 		},
