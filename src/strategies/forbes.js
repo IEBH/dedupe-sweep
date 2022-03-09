@@ -1,6 +1,6 @@
 module.exports = {
-	title: 'Forbes Automated Deduplication Sweep',
-	description: 'Deduplication Sweep with Low Rate of False Positives',
+	title: 'Forbes Automated Deduplication Sweep (Balanced)',
+	description: 'Deduplication Sweep with balance between False Positives and False Negatives',
 	mutators: {
 		authors: 'authorRewriteSingle',
 		doi: 'doiRewrite',
