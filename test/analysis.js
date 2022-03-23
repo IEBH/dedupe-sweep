@@ -37,6 +37,8 @@ var datasets = process.env.DATASET
 /**
 * Eventual final scores for each stratergy with the key as the stratergy and the value as an array of scores
 */
+var precisions = {};
+var recalls = {};
 var scores = {};
 
 /** Threshold for dupe */
@@ -116,6 +118,8 @@ strategies.forEach(strategy =>
 						mlog.log('F1 Score         =', chalk.bold.yellow(score));
 						mlog.log();
 
+						precisions[strategy] = (precisions[strategy] ?? []).concat([precision]);
+						recalls[strategy] = (recalls[strategy] ?? []).concat([recall]);
 						scores[strategy] = (scores[strategy] ?? []).concat([score]);
 					})
 			})
@@ -126,7 +130,10 @@ strategies.forEach(strategy =>
 describe('Summary', ()=> {
 	it('Final scores', ()=> {
 		Object.keys(scores).forEach(strategy => {
-			mlog.log(chalk.white(strategy), '@', chalk.yellow(scores[strategy].reduce((t, v) => t + v, 0) / scores[strategy].length))
+			mlog.log(chalk.white(strategy), '@precision', chalk.blue(precisions[strategy].reduce((t, v) => t + v, 0) / precisions[strategy].length))
+			mlog.log(chalk.white(strategy), '@recall', chalk.blue(recalls[strategy].reduce((t, v) => t + v, 0) / recalls[strategy].length))
+			mlog.log(chalk.white(strategy), '@f1', chalk.yellow(scores[strategy].reduce((t, v) => t + v, 0) / scores[strategy].length))
+			mlog.log("\n")
 		});
 	});
 });
