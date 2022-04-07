@@ -37,6 +37,7 @@ var datasets = process.env.DATASET
 /**
 * Eventual final scores for each stratergy with the key as the stratergy and the value as an array of scores
 */
+var accuracies = {};
 var precisions = {};
 var recalls = {};
 var scores = {};
@@ -110,14 +111,17 @@ strategies.forEach(strategy =>
 						mlog.log('Dupe wrong       (FN)=', stats.dupeWrong > 0 ? chalk.red(stats.dupeWrong) : chalk.green(0));
 						mlog.log(chalk.gray('----------------------------------------'));
 
+						var accuracy = (stats.dupeCorrect + stats.nonDupeCorrect) / (stats.dupeCorrect + stats.nonDupeCorrect + stats.dupeWrong + stats.nonDupeWrong) || 0;
 						var precision = stats.dupeCorrect / (stats.dupeCorrect + stats.nonDupeWrong) || 0;
 						var recall = stats.dupeCorrect / (stats.dupeCorrect + stats.dupeWrong) || 0;
 						var score = 2 * ((precision * recall) / (precision + recall)) || 0;
+						mlog.log('Accuracy        =', chalk.yellow(accuracy));
 						mlog.log('Precision        =', chalk.yellow(precision));
 						mlog.log('Recall           =', chalk.yellow(recall));
 						mlog.log('F1 Score         =', chalk.bold.yellow(score));
 						mlog.log();
 
+						accuracies[strategy] = (accuracies[strategy] ?? []).concat([accuracy]);
 						precisions[strategy] = (precisions[strategy] ?? []).concat([precision]);
 						recalls[strategy] = (recalls[strategy] ?? []).concat([recall]);
 						scores[strategy] = (scores[strategy] ?? []).concat([score]);
@@ -130,6 +134,7 @@ strategies.forEach(strategy =>
 describe('Summary', ()=> {
 	it('Final scores', ()=> {
 		Object.keys(scores).forEach(strategy => {
+			mlog.log(chalk.white(strategy), '@accuracy', chalk.blue(accuracies[strategy].reduce((t, v) => t + v, 0) / accuracies[strategy].length))
 			mlog.log(chalk.white(strategy), '@precision', chalk.blue(precisions[strategy].reduce((t, v) => t + v, 0) / precisions[strategy].length))
 			mlog.log(chalk.white(strategy), '@recall', chalk.blue(recalls[strategy].reduce((t, v) => t + v, 0) / recalls[strategy].length))
 			mlog.log(chalk.white(strategy), '@f1', chalk.yellow(scores[strategy].reduce((t, v) => t + v, 0) / scores[strategy].length))
