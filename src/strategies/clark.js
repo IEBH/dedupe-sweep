@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	title: 'IEBH Deduplication Sweep',
 	description: 'IEBH recommended deduplication four step sweep method',
 	mutators: {

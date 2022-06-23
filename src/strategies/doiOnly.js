@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	title: 'DOI only',
 	description: 'Compare references against DOI fields only',
 	mutators: {

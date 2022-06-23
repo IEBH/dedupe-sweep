@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	title: 'Forbes Automated Deduplication Sweep (Cautious)',
 	description: 'Deduplication Sweep with Low Rate of False Positives',
 	mutators: {

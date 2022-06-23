@@ -1,5 +1,5 @@
-var Dedupe = require('..');
-var expect = require('chai').expect;
+import Dedupe from '../src/index.js';
+import { expect } from 'chai';
 
 describe('Comparisons', ()=> {
 

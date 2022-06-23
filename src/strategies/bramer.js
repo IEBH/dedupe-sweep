@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	title: 'Bramer et. al.',
 	description: '<a href="https://doi.org/10.3163/1536-5050.104.3.014">Bramer et. al.</a> deduplication sweep strategy',
 	mutators: {

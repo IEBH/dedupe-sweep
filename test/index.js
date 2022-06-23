@@ -1,6 +1,6 @@
-var _ = require('lodash');
-var Dedupe = require('..');
-var expect = require('chai').expect;
+import _ from 'lodash';
+import Dedupe from '../src/index.js';
+import { expect } from 'chai';
 
 describe('Basic dedupe functionality', ()=> {
 

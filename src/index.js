@@ -1,12 +1,18 @@
-var _ = require('lodash');
-var EventEmitter = require('events').EventEmitter;
-var jaroWinklerDistance = require('jaro-winkler');
+import _ from "lodash"
+import { EventEmitter } from "events";
+import jaroWinklerDistance from 'jaro-winkler'
 
+import clark from './strategies/clark.js';
+import bramer from './strategies/bramer.js';
+import forbes from './strategies/forbes.js';
+import forbesMinFN from './strategies/forbesMinFN.js';
+import forbesMinFP from './strategies/forbesMinFP.js';
+import doiOnly from './strategies/doiOnly.js';
 
 /**
 * Dedupe class
 */
-module.exports = class Dedupe extends EventEmitter {
+export default class Dedupe extends EventEmitter {
 
 	/**
 	* Instance settings
@@ -251,12 +257,12 @@ module.exports = class Dedupe extends EventEmitter {
 
 	// Strategies {{{
 	static strategies = {
-		clark: require('./strategies/clark'),
-		bramer: require('./strategies/bramer'),
-		forbes: require('./strategies/forbes'),
-		forbesMinFN: require('./strategies/forbesMinFN'),
-		forbesMinFP: require('./strategies/forbesMinFP'),
-		doiOnly: require('./strategies/doiOnly'),
+		clark,
+		bramer,
+		forbes,
+		forbesMinFN,
+		forbesMinFP,
+		doiOnly,
 	};
 	// }}}
 

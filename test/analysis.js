@@ -1,9 +1,15 @@
-var _ = require('lodash');
-var Dedupe = require('..');
-var chalk = require('chalk');
-var expect = require('chai').expect;
-var mlog = require('mocha-logger');
-var reflib = require('reflib');
+import _ from 'lodash';
+import Dedupe from "../src/index.js"
+import chalk from "chalk"
+import { expect } from "chai"
+import mlog from 'mocha-logger';
+import reflib from "@iebh/reflib";
+
+// Fix __dirname in es
+import path from 'path';
+import {fileURLToPath} from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 /**
@@ -52,7 +58,7 @@ strategies.forEach(strategy =>
 				this.timeout(1000 * 30); // 30s per dataset
 
 				return Promise.resolve()
-					.then(()=> reflib.promises.parseFile(`${__dirname}/data/${dataset}`))
+					.then(()=> reflib.readFile(`${__dirname}/data/${dataset}`))
 					.then(refs => (new Dedupe())
 						.set('validateStratergy', false)
 						.set('action', Dedupe.ACTIONS.STATS)
