@@ -16,10 +16,10 @@ export default class Dedupe extends EventEmitter {
 
 	/**
 	* Instance settings
-	* Can be set using the utility funciton `set(key, val)`
+	* Can be set using the utility function `set(key, val)`
 	* @type {Object} The settings to use in this Dedupe instance
-	* @property {string} stratergy The stratergy to use on the next `run()` call
-	* @property {boolean} validateStratergy Validate the strategy before beginning, only disable this if you are sure the strategy is valid
+	* @property {string} strategy The strategy to use on the next `run()` call
+	* @property {boolean} validateStrategy Validate the strategy before beginning, only disable this if you are sure the strategy is valid
 	* @property {string} action The action to take when detecting a duplicate. ENUM: ACTIONS
 	* @property {string} actionField The field to use with actions
 	* @property {number} threshold Floating value (between 0 and 1) when marking or deleting refs automatically
@@ -31,7 +31,7 @@ export default class Dedupe extends EventEmitter {
 	*/
 	settings = {
 		strategy: 'clark',
-		validateStratergy: true,
+		validateStrategy: true,
 		action: 0,
 		actionField: 'dedupe',
 		threshold: 0.1,
@@ -67,7 +67,7 @@ export default class Dedupe extends EventEmitter {
 	 * Avaliable field weighting systems to use
 	 */
 	static FIELDWEIGHT = {
-		MINUMUM: 0,
+		MINIMUM: 0,
 		AVERAGE: 1
 	}
 
@@ -83,7 +83,7 @@ export default class Dedupe extends EventEmitter {
 	comparisons = {
 		exact: {
 			title: 'Exact comparison',
-			description: 'Simple character-by-character exact comaprison',
+			description: 'Simple character-by-character exact comparison',
 			handler: (a, b) => {
 				if (Array.isArray(a) && Array.isArray(b)) {
 					return JSON.stringify(a) == JSON.stringify(b);
@@ -132,7 +132,7 @@ export default class Dedupe extends EventEmitter {
 			title: 'Rewrite author names',
 			description: 'Clean up various author specifications into one standard format',
 			handler: v => {
-				if (/;/.test(v)) { // Detect semi colon seperators to search `Last, F. M.` format
+				if (/;/.test(v)) { // Detect semi colon separators to search `Last, F. M.` format
 					return _.chain(v)
 						.split(/\s*;\s*/)
 						.dropRightWhile(name => /^et\.?\s*al/i.test(name)) // Looks like "Et. Al" from end
@@ -165,7 +165,7 @@ export default class Dedupe extends EventEmitter {
 								+ _.upperFirst(format.groups.last)
 							: name;
 						})
-						.join(', ') // Join as comma-delimetered strings
+						.join(', ') // Join as comma-delimited strings
 						.value();
 				}
 			},
@@ -297,19 +297,19 @@ export default class Dedupe extends EventEmitter {
 
 	/**
 	* Validate a strategy object
-	* @param {object} stratergy The stratergy object to validate
-	* @returns {boolean|array} Either a boolean True if the stratergy is valid or an array of errors
+	* @param {object} strategy The strategy object to validate
+	* @returns {boolean|array} Either a boolean True if the strategy is valid or an array of errors
 	*/
-	validateStratergy(stratergy) {
+	validateStrategy(strategy) {
 		var errs = [];
 
 		['title', 'description', 'mutators', 'steps'].forEach(f => {
-			if (!stratergy[f]) errs.push(`Field ${f} is missing`);
+			if (!strategy[f]) errs.push(`Field ${f} is missing`);
 		});
 
-		if (!stratergy.steps.length) errs.push('Should contain at least one step');
+		if (!strategy.steps.length) errs.push('Should contain at least one step');
 
-		if (stratergy.steps) stratergy.steps.forEach((step, stepIndex) => {
+		if (strategy.steps) strategy.steps.forEach((step, stepIndex) => {
 			if (!step.fields || !step.fields.length) errs.push(`Step #${stepIndex+1} contains no fields`);
 			if (!step.sort) errs.push(`Step #${stepIndex+1} contains no sort field(s)`);
 			if (_.isArray(step.sort) && !step.sort.length) errs.push(`Step #${stepIndex+1} contains a blank sort field list`)
@@ -340,18 +340,18 @@ export default class Dedupe extends EventEmitter {
 	* @param {Object} a The first reference to compare
 	* @param {Object} b The second reference to compare
 	* @param {Object} step The step object, specifying the rules for comparison
-	* @returns {number} A floating value representing the minumum similarity between the two references for this steps rules
+	* @returns {number} A floating value representing the minimum similarity between the two references for this steps rules
 	*/
 	compareViaStepMin(a, b, step) {
-		let minumum = 1;
+		let minimum = 1;
 		step.fields.forEach(field => {
 			let score =
 				(step.skipOmitted ?? true ) && (!a[field] || !b[field])
 					? 0
 					: this.comparisons[step.comparison].handler(a[field], b[field])
-			if (score < minumum) minumum = score
+			if (score < minimum) minimum = score
 		})
-		return minumum;
+		return minimum;
 	}
 
 	/**
@@ -371,7 +371,7 @@ export default class Dedupe extends EventEmitter {
 	* @emits runMutated Emitted when the fully mutated library is ready to start deduplicating
 	*/
 	run(input) {
-		var stratergy = Dedupe.strategies[this.settings.strategy];
+		var strategy = Dedupe.strategies[this.settings.strategy];
 		var output;
 
 		return Promise.resolve()
@@ -385,18 +385,18 @@ export default class Dedupe extends EventEmitter {
 			// Sanity checks {{{
 			.then(refs => {
 				if (!_.isArray(refs)) throw new Error('Input is not an array');
-				if (!_.has(Dedupe, ['strategies', this.settings.strategy])) throw new Error('Unknown stratergy specified');
-				if (!_.isArray(_.get(Dedupe, ['strategies', this.settings.strategy, 'steps']))) throw new Error('Invalid stratergy schema');
+				if (!_.has(Dedupe, ['strategies', this.settings.strategy])) throw new Error('Unknown strategy specified');
+				if (!_.isArray(_.get(Dedupe, ['strategies', this.settings.strategy, 'steps']))) throw new Error('Invalid strategy schema');
 				return output = refs;
 			})
 			// }}}
-			// Validate stratergy {{{
+			// Validate strategy {{{
 			.then(()=> {
-				if (!this.settings.validateStratergy) return; // Checking disabled
+				if (!this.settings.validateStrategy) return; // Checking disabled
 
-				var sErrs = this.validateStratergy(stratergy);
+				var sErrs = this.validateStrategy(strategy);
 				if (sErrs === true) return;
-				throw new Error('Invalid stratergy - ' + sErrs.join(', '));
+				throw new Error('Invalid strategy - ' + sErrs.join(', '));
 			})
 			// }}}
 			// Run mutators {{{
@@ -408,7 +408,7 @@ export default class Dedupe extends EventEmitter {
 					recNumber: original.refNumber || index + 1,
 					dedupe: {steps: []}, // Storage for future dedupe info
 					...original, // Import original reference fields
-					..._.mapValues(stratergy.mutators, (mutators, field) =>
+					..._.mapValues(strategy.mutators, (mutators, field) =>
 						_.castArray(mutators).reduce((value, mutator) =>
 							this.mutators[mutator].handler(value, original)
 						, original[field] || '')
@@ -421,7 +421,7 @@ export default class Dedupe extends EventEmitter {
 				var sortedBy; // Keep track of our sort so we don't repeat this
 				var sortedRefs; // Current state of refs
 
-				stratergy.steps.forEach((step, stepIndex) => { // For each step
+				strategy.steps.forEach((step, stepIndex) => { // For each step
 					if (!sortedBy || sortedBy != step.sort) { // Sort if needed
 						sortedRefs = _.sortBy(refs, step.sort); // Sort by the designated fields
 						sortedBy = step.sort;
@@ -431,8 +431,8 @@ export default class Dedupe extends EventEmitter {
 					var n = i + 1;
 					while (n < sortedRefs.length) { // Walk all elements of the array...
 						// Emit progress
-						this.emitProgress(stepIndex * sortedRefs.length + i, stratergy.steps.length * sortedRefs.length)
-						var dupeScore = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINUMUM
+						this.emitProgress(stepIndex * sortedRefs.length + i, strategy.steps.length * sortedRefs.length)
+						var dupeScore = this.settings.fieldWeight == Dedupe.FIELDWEIGHT.MINIMUM
 							? this.compareViaStepMin(sortedRefs[i], sortedRefs[n], step)
 							: this.compareViaStepAvg(sortedRefs[i], sortedRefs[n], step);
 						if (dupeScore > 0) { // Hit a duplicate, `i` is now the index of the last unique ref

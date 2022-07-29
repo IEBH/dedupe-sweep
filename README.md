@@ -60,8 +60,8 @@ Object storing all local settings for the class.
 
 | Setting           | Type              | Default    | Description                                                                                                                         |
 |-------------------|-------------------|------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| stratergy         | string            | `'clark'`  | The stratergy to use on the next `run()` |
-| validateStratergy | boolean           | `true`     | Validate the strategy before beginning, only disable this if you are sure the strategy is valid |
+| strategy         | string            | `'clark'`  | The strategy to use on the next `run()` |
+| validateStrategy | boolean           | `true`     | Validate the strategy before beginning, only disable this if you are sure the strategy is valid |
 | action            | string            | '`0`'      | The action to take when detecting a duplicate. ENUM: ACTIONS |
 | actionField       | string            | `'dedupe'` | The field to use with actions |
 | threshold         | number            | `0.1`      | Floating value (between 0 and 1) when marking or deleting refs automatically |
@@ -99,7 +99,7 @@ How to refer to other references.
 
 | Value | Setting       | Description                                               |
 |-------|---------------|-----------------------------------------------------------|
-| `0`   | `'MINIMUM'`   | Calculate duplication score based on minumum field score  |
+| `0`   | `'MINIMUM'`   | Calculate duplication score based on minimum field score  |
 | `1`   | `'AVERAGE'`   | Calculate duplication score based on average field score  |
 
 

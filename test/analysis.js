@@ -41,7 +41,7 @@ var datasets = process.env.DATASET
 	];
 
 /**
-* Eventual final scores for each stratergy with the key as the stratergy and the value as an array of scores
+* Eventual final scores for each strategy with the key as the strategy and the value as an array of scores
 */
 var accuracies = {};
 var precisions = {};
@@ -60,11 +60,11 @@ strategies.forEach(strategy =>
 				return Promise.resolve()
 					.then(()=> reflib.readFile(`${__dirname}/data/${dataset}`))
 					.then(refs => (new Dedupe())
-						.set('validateStratergy', false)
+						.set('validateStrategy', false)
 						.set('action', Dedupe.ACTIONS.STATS)
 						.set('strategy', strategy)
 						.set('actionField', 'result')
-						.set('fieldWeight', Dedupe.FIELDWEIGHT.MINUMUM)
+						.set('fieldWeight', Dedupe.FIELDWEIGHT.MINIMUM)
 						.set('threshold', threshold)
 						.set('markOriginal', true)
 						.run(refs)
