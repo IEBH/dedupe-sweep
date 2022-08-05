@@ -65,7 +65,7 @@ strategies.forEach(strategy =>
 						.set('strategy', strategy)
 						.set('actionField', 'result')
 						.set('fieldWeight', Dedupe.FIELDWEIGHT.MINIMUM)
-						.set('threshold', threshold)
+						.set('threshold', threshold) // TODO: Define this in strategy file
 						.set('markOriginal', true)
 						.run(refs)
 					)
