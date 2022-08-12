@@ -11,7 +11,6 @@ export default {
 		pages: 'consistentPageNumbering'
 	},
 	steps: [
-		// Higher accuracy without doi
 		{
 			fields: ['doi', 'pages'],
 			sort: 'doi',
