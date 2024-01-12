@@ -121,10 +121,10 @@ strategies.forEach(strategy =>
 						var precision = stats.dupeCorrect / (stats.dupeCorrect + stats.nonDupeWrong) || 0;
 						var recall = stats.dupeCorrect / (stats.dupeCorrect + stats.dupeWrong) || 0;
 						var score = 2 * ((precision * recall) / (precision + recall)) || 0;
-						mlog.log('Accuracy        =', chalk.yellow(accuracy));
-						mlog.log('Precision        =', chalk.yellow(precision));
-						mlog.log('Recall           =', chalk.yellow(recall));
-						mlog.log('F1 Score         =', chalk.bold.yellow(score));
+						mlog.log('Accuracy        =', chalk.yellow(accuracy.toFixed(4)));
+						mlog.log('Precision        =', chalk.yellow(precision.toFixed(4)));
+						mlog.log('Recall           =', chalk.yellow(recall.toFixed(4)));
+						mlog.log('F1 Score         =', chalk.bold.yellow(score.toFixed(4)));
 						mlog.log();
 
 						accuracies[strategy] = (accuracies[strategy] ?? []).concat([accuracy]);
@@ -140,10 +140,10 @@ strategies.forEach(strategy =>
 describe('Summary', ()=> {
 	it('Final scores', ()=> {
 		Object.keys(scores).forEach(strategy => {
-			mlog.log(chalk.white(strategy), '@accuracy', chalk.blue(accuracies[strategy].reduce((t, v) => t + v, 0) / accuracies[strategy].length))
-			mlog.log(chalk.white(strategy), '@precision', chalk.blue(precisions[strategy].reduce((t, v) => t + v, 0) / precisions[strategy].length))
-			mlog.log(chalk.white(strategy), '@recall', chalk.blue(recalls[strategy].reduce((t, v) => t + v, 0) / recalls[strategy].length))
-			mlog.log(chalk.white(strategy), '@f1', chalk.yellow(scores[strategy].reduce((t, v) => t + v, 0) / scores[strategy].length))
+			mlog.log(chalk.white(strategy), '@accuracy', chalk.blue((accuracies[strategy].reduce((t, v) => t + v, 0) / accuracies[strategy].length).toFixed(4)))
+			mlog.log(chalk.white(strategy), '@precision', chalk.blue((precisions[strategy].reduce((t, v) => t + v, 0) / precisions[strategy].length).toFixed(4)))
+			mlog.log(chalk.white(strategy), '@recall', chalk.blue((recalls[strategy].reduce((t, v) => t + v, 0) / recalls[strategy].length).toFixed(4)))
+			mlog.log(chalk.white(strategy), '@f1', chalk.yellow((scores[strategy].reduce((t, v) => t + v, 0) / scores[strategy].length).toFixed(4)))
 			mlog.log("\n")
 		});
 	});
